@@ -6,7 +6,7 @@ from utils.generate_embeddings import chain, search_index,template
 app = FastAPI()
 
 @app.get("/")
-async def root(question: str):
+async def root():
     return {"message": "Hello World"}
 
 @app.get("/chat")
