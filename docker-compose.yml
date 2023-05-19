@@ -6,7 +6,7 @@ services:
     networks:
       - gateway
     ports:
-      - "8000:80"
+      - "8008:80"
     volumes:
       - ./docs:/app/docs
     environment:
@@ -14,3 +14,4 @@ services:
     
 networks:
   gateway:
+    driver: bridge
