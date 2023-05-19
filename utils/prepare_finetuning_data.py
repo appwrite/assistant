@@ -9,7 +9,6 @@ def get_appwrite_data(path: str):
     soup = BeautifulSoup(data, 'html.parser')
     results = soup.select('body > main > div > div > div.col.span-10 > article > div > div')
     for result in results:
-        print(result)
-        break
+        
 
 get_appwrite_data('client/account?sdk=web-default&v=1.1.x')

@@ -7,6 +7,10 @@ app = FastAPI()
 
 @app.get("/")
 async def root(question: str):
+    return {"message": "Hello World"}
+
+@app.get("/chat")
+async def chat(question: str):
     answer =  chain(
             {
                 "input_documents": search_index.similarity_search(question, k=4),
