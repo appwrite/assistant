@@ -14,4 +14,4 @@ services:
     
 networks:
   gateway:
-    driver: host
+    driver: bridge
