@@ -5,11 +5,11 @@ from utils.generate_embeddings import chain, search_index,template
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
+@app.get("/health")
+async def health():
     return {"message": "Hello World"}
 
-@app.get("/chat")
+@app.get("/")
 async def chat(question: str):
     answer =  chain(
             {

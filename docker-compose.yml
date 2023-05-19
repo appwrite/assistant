@@ -6,7 +6,7 @@ services:
     networks:
       - gateway
     ports:
-      - "8008:80"
+      - "8080:80"
     volumes:
       - ./docs:/app/docs
     environment:
