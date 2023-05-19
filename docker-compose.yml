@@ -3,9 +3,14 @@ version: '3.8'
 services:
   web:
     build: .
+    networks:
+      - gateway
     ports:
       - "8000:80"
     volumes:
       - ./docs:/app/docs
     environment:
       - OPENAI_API_KEY
+    
+networks:
+  gateway:
