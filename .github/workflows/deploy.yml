@@ -23,7 +23,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            url="https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/appwrite/${{ env.REPOSITORY }}.git"
+            url="https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ env.NAMESPACE }}/${{ env.REPOSITORY }}.git"
             if ! git clone "${url}" "${{ env.REPOSITORY }}" 2>/dev/null && [ -d "${{ env.REPOSITORY }}" ] ; then
                 echo "Clone failed because the folder ${{ env.REPOSITORY }} exists"
             fi
