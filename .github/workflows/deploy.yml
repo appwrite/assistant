@@ -8,7 +8,7 @@ on:
 
 env:
   TAG: ${{ github.sha }}
-  NAMESPACE: appwrite
+  NAMESPACE: christyjacob4
   REPOSITORY: assistant
   COMPOSE_FILE: docker-compose.yml
 
