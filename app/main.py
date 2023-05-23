@@ -4,7 +4,6 @@ from typing import Union
 from fastapi.middleware.cors import CORSMiddleware
 from utils.generate_embeddings import chain, search_index,template
 
-
 origins = [
     "http://localhost",
     "http://localhost:3000",
@@ -20,11 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/health")
-async def health():
+@app.get("/")
+async def root():
     return {"message": "Hello World"}
 
-@app.get("/")
+@app.get("/chat")
 async def chat(question: str):
     answer =  chain(
             {
