@@ -24,7 +24,7 @@ const template = (
   prompt
 ) => `You are an AI chat bot trained on Appwrite Docs. You need to help developers answer Appwrite related
 question only. You will be given an input and you need to respond with the appropriate answer from the
-reference docs. For each question show code examples when applicable. Answer in atleast 100 words.
+reference docs. For each question show code examples when applicable. Answer in atleast 200 words.
 ${prompt}`;
 
 app.post("/", async (req, res) => {

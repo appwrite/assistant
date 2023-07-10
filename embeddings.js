@@ -1,12 +1,10 @@
-import { loadQAStuffChain } from "langchain/chains";
-
-import { FaissStore } from "langchain/vectorstores/faiss";
-
 import fs from "fs";
 import { globSync } from "glob";
+
+import { loadQAStuffChain } from "langchain/chains";
+import { FaissStore } from "langchain/vectorstores/faiss";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { OpenAIChat } from "langchain/llms/openai";
-
 import { Document } from "langchain/document";
 import { CharacterTextSplitter } from "langchain/text_splitter";
 
