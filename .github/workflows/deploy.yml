@@ -1,0 +1,41 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+env:
+  TAG: ${{ github.sha }}
+  NAMESPACE: christyjacob4
+  REPOSITORY: assistant
+  COMPOSE_FILE: docker-compose.yml
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute SSH commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            url="https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ env.NAMESPACE }}/${{ env.REPOSITORY }}.git"
+            if ! git clone "${url}" "${{ env.REPOSITORY }}" 2>/dev/null && [ -d "${{ env.REPOSITORY }}" ] ; then
+                echo "Clone failed because the folder ${{ env.REPOSITORY }} exists"
+            fi
+
+            cd ${{ env.REPOSITORY }}
+            git reset --hard HEAD
+            git remote set-url origin $url
+            git fetch origin --tags
+            git checkout ${{ env.TAG }}
+
+            rm -f .env
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+
+            docker compose -f ${{ env.COMPOSE_FILE }} convert
+            docker compose -f ${{ env.COMPOSE_FILE }} up -d
