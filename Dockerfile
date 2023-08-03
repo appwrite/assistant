@@ -1,10 +1,18 @@
-FROM python:3.9
+FROM node:18
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY package.json ./
+COPY pnpm-lock.yaml ./
 
+RUN npm install -g pnpm
+
+RUN pnpm --prod install
+# If you are building your code for production
+# RUN npm ci --omit=dev
+
+# Bundle app source
 COPY . .
 
-CMD [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80" ]
+EXPOSE 3003
+CMD [ "node", "main.js" ]
