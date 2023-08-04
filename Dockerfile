@@ -8,11 +8,11 @@ COPY pnpm-lock.yaml ./
 RUN npm install -g pnpm
 
 RUN pnpm --prod install
-# If you are building your code for production
-# RUN npm ci --omit=dev
 
-# Bundle app source
 COPY . .
+
+ENV OPENAI_API_KEY='' \
+    ASSISTANT_SECRET=''
 
 EXPOSE 3003
 CMD [ "node", "main.js" ]
