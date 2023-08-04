@@ -46,11 +46,11 @@ doc-548-submit-a-pull-request-section-to-contribution-guide
 
 When `TYPE` can be:
 
--   **feat** - is a new feature
--   **doc** - documentation only changes
--   **cicd** - changes related to CI/CD system
--   **fix** - a bug fix
--   **refactor** - code change that neither fixes a bug nor adds a feature
+- **feat** - is a new feature
+- **doc** - documentation only changes
+- **cicd** - changes related to CI/CD system
+- **fix** - a bug fix
+- **refactor** - code change that neither fixes a bug nor adds a feature
 
 **All PRs must include a commit message with a description of the changes made!**
 
@@ -102,6 +102,17 @@ Don't use `@fixme`, which defines things that are broken. Don't commit broken co
 Please avoid introducing new dependencies to Appwrite without consulting the team. New dependencies can be very helpful, but they also introduce new security and privacy issues, complexity, and impact total docker image size.
 
 Adding a new dependency should contribute vital value to the product with minimum possible risk.
+
+## Updating the Documentation
+
+We created a python script, located at `scrape.py`, that fetches various links in the Appwrite documentation, and saves them to JSON files in the `docs` folder. To run the script, execute the following command.
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 scrape.py
+```
+
+To update the documentation, you can change which files are fetched by editing the `scrape.py` file.
 
 ## Introducing New Features
 
