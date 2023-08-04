@@ -1,40 +1,12 @@
 version: '3.8'
 
 services:
-  traefik:
-    image: traefik:v2.10
-    command:
-      - --log.level=DEBUG
-      - --api.insecure=true
-      - --providers.docker=true
-      - --providers.docker.exposedByDefault=false
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --accesslog=true
-    ports:
-      - 80:80
-      - 8080:8080
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    networks:
-      - gateway
-
   assistant:
     build: .
-    networks:
-      - gateway
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.assistant-service.loadbalancer.server.port=80"
-      # http
-      - "traefik.http.routers.assistant.entrypoints=web"
-      - "traefik.http.routers.assistant.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.assistant.service=assistant-service"
+    ports:
+      - 3003:3003
     volumes:
       - ./docs:/app/docs
     environment:
       - OPENAI_API_KEY
-
-networks:
-  gateway:
-    driver: bridge
+      - ASSISTANT_SECRET

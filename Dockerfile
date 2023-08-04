@@ -1,10 +1,18 @@
-FROM python:3.9
+FROM node:18
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY package.json ./
+COPY pnpm-lock.yaml ./
+
+RUN npm install -g pnpm
+
+RUN pnpm --prod install
 
 COPY . .
 
-CMD [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80" ]
+ENV OPENAI_API_KEY='' \
+    ASSISTANT_SECRET=''
+
+EXPOSE 3003
+CMD [ "node", "main.js" ]
