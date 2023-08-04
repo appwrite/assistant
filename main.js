@@ -21,6 +21,12 @@ reference docs. For each question show code examples when applicable.
 ${prompt}`;
 
 app.post("/", async (req, res) => {
+  const secret = req.headers.authorization;
+  if(secret !== process.env.ASSISTANT_SECRET) {
+    res.status(403);
+    res.send('Unauthorized access. Please make sure you are providing the authorized secret key.')
+    return;
+  }
   // raw to text
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
@@ -37,5 +43,5 @@ app.post("/", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Started server on port: ${port}`);
 });
