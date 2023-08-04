@@ -9,4 +9,3 @@ services:
       - ./docs:/app/docs
     environment:
       - OPENAI_API_KEY
-      - ASSISTANT_SECRET
