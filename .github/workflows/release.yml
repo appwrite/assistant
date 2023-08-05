@@ -35,11 +35,8 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: appwrite/appwrite
-        tags: |
-          type=semver,pattern={{major}}.{{minor}}.{{patch}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
+        images: appwrite/assistant
+        tags: type=semver,pattern={{major}}.{{minor}}.{{patch}}
 
     - name: Build and push
       uses: docker/build-push-action@v4
