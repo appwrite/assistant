@@ -11,7 +11,7 @@ RUN pnpm --prod install
 
 COPY . .
 
-ENV OPENAI_API_KEY=''
+ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 
 EXPOSE 3003
 CMD [ "node", "main.js" ]

@@ -8,4 +8,4 @@ services:
     volumes:
       - ./docs:/app/docs
     environment:
-      - OPENAI_API_KEY
+      - _APP_ASSISTANT_OPENAI_API_KEY
