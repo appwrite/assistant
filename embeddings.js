@@ -8,6 +8,8 @@ import { OpenAIChat } from "langchain/llms/openai";
 import { Document } from "langchain/document";
 import { CharacterTextSplitter } from "langchain/text_splitter";
 
+const apiKey = process.env['_APP_ASSISTANT_OPENAI_API_KEY'] ?? undefined;
+
 async function chunk_sources(sources) {
   const source_chunks = [];
   const splitter = new CharacterTextSplitter({
@@ -40,12 +42,14 @@ const sources = globSync("docs/*.json").map((filename) => {
 
 export const search_index = FaissStore.fromDocuments(
   await chunk_sources(sources),
-  new OpenAIEmbeddings()
+  new OpenAIEmbeddings({
+    openAIApiKey: apiKey
+  })
 );
 export const getChain = (res) => {
   return loadQAStuffChain(
     new OpenAIChat({
-      openAIApiKey: process.env['_APP_ASSISTANT_OPENAI_API_KEY'] ?? undefined,
+      openAIApiKey: apiKey,
       temperature: 0.6,
       max_tokens: 1000,
       streaming: true,
