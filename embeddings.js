@@ -40,7 +40,9 @@ const sources = globSync("docs/*.json").map((filename) => {
 
 export const search_index = FaissStore.fromDocuments(
   await chunk_sources(sources),
-  new OpenAIEmbeddings()
+  new OpenAIEmbeddings({
+    openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
+  })
 );
 export const getChain = (res) => {
   return loadQAStuffChain(
