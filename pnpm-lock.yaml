@@ -18,14 +18,14 @@ dependencies:
     specifier: ^4.18.2
     version: 4.18.2
   faiss-node:
-    specifier: ^0.3.0
-    version: 0.3.0
+    specifier: ^0.2.2
+    version: 0.2.2
   glob:
     specifier: ^10.3.1
     version: 10.3.1
   langchain:
     specifier: ^0.0.104
-    version: 0.0.104(faiss-node@0.3.0)
+    version: 0.0.104(faiss-node@0.2.2)
   nodemon:
     specifier: ^2.0.22
     version: 2.0.22
@@ -650,8 +650,8 @@ packages:
       - supports-color
     dev: false
 
-  /faiss-node@0.3.0:
-    resolution: {integrity: sha512-ozqt6H92+dqFtmLXnQsu7Rle73HYjls3Ub7j/0otlQBpQtM8D7EZddCcq/X6p5pSg/Te6+R73JPIIt5o0FOv0g==}
+  /faiss-node@0.2.2:
+    resolution: {integrity: sha512-6Hue9mFwxfOCdCXXvgezKulkKlVVeKAdCOYaRkzlrrObJngahOCyW3qrh64trXglpWc1vP9+3aF3mENnNKTOfA==}
     engines: {node: '>= 14.0.0'}
     requiresBuild: true
     dependencies:
@@ -905,7 +905,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /langchain@0.0.104(faiss-node@0.3.0):
+  /langchain@0.0.104(faiss-node@0.2.2):
     resolution: {integrity: sha512-VmRMvUQt7599XU68fpMNY3eT3fY+MPgzxSf8tRP31WMs5GRv8A61mDRYWCY1KPBONxDvJqySGVMEIOb16aQebg==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -1076,7 +1076,7 @@ packages:
       camelcase: 6.3.0
       decamelize: 1.2.0
       expr-eval: 2.0.2
-      faiss-node: 0.3.0
+      faiss-node: 0.2.2
       flat: 5.0.2
       js-tiktoken: 1.0.7
       js-yaml: 4.1.0
