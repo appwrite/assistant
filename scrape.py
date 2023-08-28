@@ -5,13 +5,24 @@ from uuid import uuid1
 import requests
 from bs4 import BeautifulSoup
 
+import re
 
-def get_appwrite_data(path: str):
-    url = f"https://appwrite.io/docs/{path}"
+def extract_hrefs(html_code):
+    hrefs = re.findall(r'href=["\'](.*?)["\']', html_code)
+    return hrefs
+
+def get_appwrite_data(url: str):
+    print(f"Getting data from {url}...")
     data = requests.get(url).text
     soup = BeautifulSoup(data, 'html.parser')
 
-    content = soup.select('.docs > .row > .col:nth-child(2) > article')[0]
+    contents = soup.select('.docs > .row > .col:nth-child(2) > article')
+    if len(contents) == 0:
+        return dict(
+        page_content=json.dumps(data),
+        metadata={"source": url},
+    )
+    content = contents[0]
 
     sections = []
     current_section = None
@@ -41,61 +52,40 @@ def get_appwrite_data(path: str):
     )
 
 
-sources = [
-    get_appwrite_data("getting-started-for-web"),
-    get_appwrite_data("getting-started-for-flutter"),
-    get_appwrite_data("getting-started-for-apple"),
-    get_appwrite_data("getting-started-for-android"),
-    get_appwrite_data("getting-started-for-server"),
-    get_appwrite_data("command-line"),
-    get_appwrite_data("command-line-deployment"),
-    get_appwrite_data("command-line-commands"),
-    get_appwrite_data("command-line-ci"),
-    get_appwrite_data("sdks"),
-    get_appwrite_data("rest"),
-    get_appwrite_data("graphql"),
-    get_appwrite_data("realtime"),
-    get_appwrite_data("client/account"),
-    get_appwrite_data("server/users"),
-    get_appwrite_data("client/teams"),
-    get_appwrite_data("client/databases"),
-    get_appwrite_data("client/storage"),
-    get_appwrite_data("client/functions"),
-    get_appwrite_data("client/locale"),
-    get_appwrite_data("client/avatars"),
-    get_appwrite_data("server/health"),
-    get_appwrite_data("databases"),
-    get_appwrite_data("databases-queries"),
-    get_appwrite_data("databases-pagination"),
-    get_appwrite_data("databases-relationships"),
-    get_appwrite_data("storage"),
-    get_appwrite_data("authentication"),
-    get_appwrite_data("authentication-server"),
-    get_appwrite_data("authentication-security"),
-    get_appwrite_data("functions"),
-    get_appwrite_data("keys"),
-    get_appwrite_data("permissions"),
-    get_appwrite_data("events"),
-    get_appwrite_data("queries"),
-    get_appwrite_data("pagination"),
-    get_appwrite_data("webhooks"),
-    get_appwrite_data("custom-domains"),
-    get_appwrite_data("response-codes"),
-    get_appwrite_data("rate-limits"),
-    get_appwrite_data("self-hosting"),
-    get_appwrite_data("configuration"),
-    get_appwrite_data("environment-variables"),
-    get_appwrite_data("email-delivery"),
-    get_appwrite_data("sms-delivery"),
-    get_appwrite_data("certificates"),
-    get_appwrite_data("debugging"),
-    get_appwrite_data("upgrade"),
-    get_appwrite_data("production"),
-]
+links = []
+def get_docs_data(base: str, path: str = ""):
+    print()
+    data = requests.get(f"{base}{path}").text
+    hrefs = extract_hrefs(data)
+    print(f"Found {len(hrefs)} links in {base}{path}")
 
+
+    for href in hrefs:
+        newPath = href.split("#")[0]
+        newUrl = f"{base}{newPath}"
+        if newPath and newPath.startswith("/docs")  and newUrl not in links:
+            print(f"Found new valid link {newUrl}")
+            links.append(newUrl)
+            print(f"New total links: {len(links)}")
+            get_docs_data(base, newPath)
+
+
+
+get_docs_data("http://167.172.175.165:2080")
+print(f"\nTotal docs links found: {len(links)}")
+
+print("Getting data from links...")
+sources = [get_appwrite_data(link) for link in links]
+print("Done!")
+
+
+print(f"Total sources: {len(sources)}")
+print("\nSaving data...")
 # Delete all files in docs
 for filename in os.listdir("docs"):
     os.remove(f"docs/{filename}")
 
 for source in sources:
-    json.dump(source, open(f"docs/{uuid1()}.json", "w"))
+    with open(f"docs/{uuid1()}.json", "w") as f:
+        json.dump(source, f)
+print("Done! Bye!")
