@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import { getChain, search_index } from "./embeddings.js";
+import "dotenv/config";
 
 const app = express();
 app.use(
