@@ -30,20 +30,25 @@ async function chunk_sources(sources) {
   return source_chunks;
 }
 
-const sources = globSync("docs/*.json").map((filename) => {
-  const source = JSON.parse(fs.readFileSync(filename));
-  return new Document({
-    pageContent: source.page_content,
-    metadata: source.metadata,
-  });
-});
 
-export const search_index = FaissStore.fromDocuments(
-  await chunk_sources(sources),
-  new OpenAIEmbeddings({
-    openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-  })
-);
+
+export const initializeSearchIndex = async () => {
+  const sources = globSync("docs/*.json").map((filename) => {
+    const source = JSON.parse(fs.readFileSync(filename));
+    return new Document({
+      pageContent: source.page_content,
+      metadata: source.metadata,
+    });
+  });
+  
+  return FaissStore.fromDocuments(
+    await chunk_sources(sources),
+    new OpenAIEmbeddings({
+      openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
+    })
+  );
+}
+
 export const getChain = (res) => {
   return loadQAStuffChain(
     new OpenAIChat({
