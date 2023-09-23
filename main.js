@@ -1,7 +1,7 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-import { getChain, search_index } from "./embeddings.js";
+import { getChain, initializeSearchIndex } from "./embeddings.js";
 import "dotenv/config";
 
 const app = express();
@@ -11,6 +11,8 @@ app.use(
   })
 );
 app.use(bodyParser.raw({ inflate: true, type: "*/*" }));
+
+let searchIndex = null;
 
 const port = 3003;
 
@@ -22,6 +24,10 @@ reference docs. For each question show code examples when applicable.
 ${prompt}`;
 
 app.post("/", async (req, res) => {
+  if (!searchIndex) {
+    res.status(500).send("Search index not initialized");
+    return;
+  }
   // raw to text
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
@@ -30,13 +36,20 @@ app.post("/", async (req, res) => {
 
   const chain = await getChain(res);
   await chain.call({
-    input_documents: await (await search_index).similaritySearch(templated, 4),
+    input_documents: await searchIndex.similaritySearch(templated, 4),
     question: templated,
   });
 
   res.end();
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
+  console.log('Initializing search index...');
+  try {
+    searchIndex = await initializeSearchIndex();
+    console.log('Search index initialized');
+  } catch (e) {
+    console.error(e);
+  }
 });
