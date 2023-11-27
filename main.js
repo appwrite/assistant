@@ -18,9 +18,7 @@ const port = 3003;
 
 const template = (
   prompt
-) => `You are an AI chat bot trained on Appwrite Docs. You need to help developers answer Appwrite related
-question only. You will be given an input and you need to respond with the appropriate answer from the
-reference docs. For each question show code examples when applicable.
+) => `You are an AI chat bot trained on Appwrite Docs. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer from the reference docs. For each question show code examples when applicable. Unless otherwise specified, you should provide examples using the Node and Web SDKs.
 ${prompt}`;
 
 app.post("/", async (req, res) => {
@@ -34,17 +32,26 @@ app.post("/", async (req, res) => {
   const { prompt } = JSON.parse(text);
   const templated = template(prompt);
 
-  const chain = await getChain(res);
-  const inputDocuments = await searchIndex.similaritySearch(templated, 4);
+  const inputDocuments = await searchIndex.similaritySearch(prompt, 4);
+  if (process.env.DEBUG) {
+    res.write("Prompt: " + templated + "\n\n");
+
+    for (const doc of inputDocuments) {
+      res.write("Using source: " + doc.metadata.url + "\n");
+      res.write(doc.pageContent + "\n\n");
+    }
+
+    res.write("Completion: ");
+  }
+
+  const chain = await getChain((token) => {
+    res.write(token);
+  });
 
   await chain.call({
     input_documents: inputDocuments,
     question: templated,
   });
-
-  if (process.env.DEBUG) {
-    res.write(JSON.stringify(inputDocuments, null, 2));
-  }
 
   res.end();
 });

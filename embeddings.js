@@ -3,19 +3,18 @@ import { FaissStore } from "langchain/vectorstores/faiss";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { OpenAIChat } from "langchain/llms/openai";
 import { Document } from "langchain/document";
-import { CharacterTextSplitter } from "langchain/text_splitter";
+import { MarkdownTextSplitter } from "langchain/text_splitter";
 import { documentation } from "./scrape.js";
 
 async function chunk_sources(sources) {
   const source_chunks = [];
-  const splitter = new CharacterTextSplitter({
-    separator: " ",
+  const splitter = new MarkdownTextSplitter({
     chunk_size: 1024,
     chunk_overlap: 64,
   });
 
-  for (let source of sources) {
-    for (let chunk of await splitter.splitText(source.pageContent)) {
+  for (const source of sources) {
+    for (const chunk of await splitter.splitText(source.pageContent)) {
       source_chunks.push(
         new Document({
           pageContent: chunk,
@@ -44,18 +43,16 @@ export const initializeSearchIndex = async () => {
   );
 };
 
-export const getChain = (res) => {
+export const getChain = (handleLLMNewToken) => {
   return loadQAStuffChain(
     new OpenAIChat({
       openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-      temperature: 0.6,
+      temperature: 0.3,
       max_tokens: 1000,
       streaming: true,
       callbacks: [
         {
-          handleLLMNewToken: (token) => {
-            res.write(token);
-          },
+          handleLLMNewToken,
         },
       ],
     })
