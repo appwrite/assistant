@@ -35,20 +35,26 @@ app.post("/", async (req, res) => {
   const templated = template(prompt);
 
   const chain = await getChain(res);
+  const inputDocuments = await searchIndex.similaritySearch(templated, 4);
+
   await chain.call({
-    input_documents: await searchIndex.similaritySearch(templated, 4),
+    input_documents: inputDocuments,
     question: templated,
   });
+
+  if (process.env.DEBUG) {
+    res.write(JSON.stringify(inputDocuments, null, 2));
+  }
 
   res.end();
 });
 
 app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
-  console.log('Initializing search index...');
+  console.log("Initializing search index...");
   try {
     searchIndex = await initializeSearchIndex();
-    console.log('Search index initialized');
+    console.log("Search index initialized");
   } catch (e) {
     console.error(e);
   }

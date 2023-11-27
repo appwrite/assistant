@@ -11,6 +11,8 @@ RUN pnpm --prod install
 
 COPY . .
 
+RUN git submodule update --init --recursive
+
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 
 EXPOSE 3003

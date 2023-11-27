@@ -1,12 +1,10 @@
-import fs from "fs";
-import { globSync } from "glob";
-
 import { loadQAStuffChain } from "langchain/chains";
 import { FaissStore } from "langchain/vectorstores/faiss";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { OpenAIChat } from "langchain/llms/openai";
 import { Document } from "langchain/document";
 import { CharacterTextSplitter } from "langchain/text_splitter";
+import { documentation } from "./scrape.js";
 
 async function chunk_sources(sources) {
   const source_chunks = [];
@@ -30,24 +28,21 @@ async function chunk_sources(sources) {
   return source_chunks;
 }
 
-
-
 export const initializeSearchIndex = async () => {
-  const sources = globSync("docs/*.json").map((filename) => {
-    const source = JSON.parse(fs.readFileSync(filename));
+  const sources = documentation.map((page) => {
     return new Document({
-      pageContent: source.page_content,
-      metadata: source.metadata,
+      pageContent: page.contents,
+      metadata: page.metadata,
     });
   });
-  
+
   return FaissStore.fromDocuments(
     await chunk_sources(sources),
     new OpenAIEmbeddings({
       openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
     })
   );
-}
+};
 
 export const getChain = (res) => {
   return loadQAStuffChain(
