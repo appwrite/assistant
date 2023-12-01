@@ -32,6 +32,17 @@ Finally, start a development server:
 npm run dev
 ```
 
+### 4. Testing the changes
+
+We use a set of benchmark questions to test your changes:
+
+- How do you add a custom domain in the console?
+- Show me how I can set up database collections and documents.
+- What's the difference between Server and Client SDKs?
+- How do I use the users API to create a new user with Dart?
+
+You can execute the [npm run test](./scripts/test-prompts.js) script to write snapshots of the answers to these questions to the tests folder.
+
 ## Submit a Pull Request 🚀
 
 The branch naming convention is as follows

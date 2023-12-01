@@ -1,39 +1,25 @@
 import { mkdir, writeFile } from "fs/promises";
 import { execa } from "execa";
 
-await mkdir("./sources", { recursive: true });
-
-await gitClone("https://github.com/appwrite/website.git", "./sources/website", [
+const REPOSITORY_URL = "https://github.com/appwrite/website.git";
+const LOCAL_PATH = "./sources/website";
+const FILES = [
   "src/routes/docs/**/*.markdoc",
   "src/routes/docs/**/*.md",
   "src/partials/**/*.md",
-]);
+];
 
-async function gitClone(repositoryUrl, localPath, files = "*") {
-  await execa("rm", ["-rf", localPath]);
+await execa("rm", ["-rf", LOCAL_PATH]);
+await mkdir(LOCAL_PATH, { recursive: true });
 
-  console.log(`Cloning ${repositoryUrl} to ${localPath}`);
-  try {
-    await execa("git", ["clone", "--no-checkout", repositoryUrl, localPath]);
+console.log(`Cloning ${REPOSITORY_URL} to ${LOCAL_PATH}...`);
 
-    if (files !== "*") {
-      if (!Array.isArray(files)) {
-        files = [files];
-      }
+await execa("git", ["clone", "--no-checkout", REPOSITORY_URL, LOCAL_PATH]);
 
-      await mkdir(`${localPath}/.git/info`, { recursive: true });
-      await writeFile(
-        `${localPath}/.git/info/sparse-checkout`,
-        files.join("\n")
-      );
+await mkdir(`${LOCAL_PATH}/.git/info`, { recursive: true });
+await writeFile(`${LOCAL_PATH}/.git/info/sparse-checkout`, FILES.join("\n"));
+await execa("git", ["config", "core.sparseCheckout", "true"], {
+  cwd: LOCAL_PATH,
+});
 
-      await execa("git", ["config", "core.sparseCheckout", "true"], {
-        cwd: localPath,
-      });
-    }
-
-    await execa("git", ["checkout"], { cwd: localPath });
-  } catch (error) {
-    console.error("An error occurred:", error);
-  }
-}
+await execa("git", ["checkout"], { cwd: LOCAL_PATH });

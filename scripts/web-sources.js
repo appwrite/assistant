@@ -2,11 +2,7 @@ import { mkdir, writeFile } from "fs/promises";
 import { execa } from "execa";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 
-console.log("Downloading reference pages");
-
-await execa("rm", ["-rf", "./sources/references"]);
-await mkdir("./sources/references", { recursive: true });
-
+const LOCAL_PATH = "./sources/references";
 const SDKS = [
   "client-web",
   "client-flutter",
@@ -28,7 +24,6 @@ const SDKS = [
   "server-graphql",
   "server-rest",
 ];
-
 const SERVICES = [
   "account",
   "avatars",
@@ -39,6 +34,11 @@ const SERVICES = [
   "teams",
   "users",
 ];
+
+await execa("rm", ["-rf", LOCAL_PATH]);
+await mkdir(LOCAL_PATH, { recursive: true });
+
+console.log("Downloading reference pages...");
 
 for (const sdk of SDKS) {
   await mkdir(`./sources/references/${sdk}/`, { recursive: true });

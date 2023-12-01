@@ -33,11 +33,6 @@ app.post("/", async (req, res) => {
   const templated = template(prompt);
 
   const inputDocuments = await searchIndex.similaritySearch(prompt, 5);
-  for (const inputDocument of inputDocuments) {
-    res.write(`Using source: `);
-    res.write(`- ${inputDocument.metadata.filename}\n`);
-  }
-
   const chain = await getChain((token) => {
     res.write(token);
   });
