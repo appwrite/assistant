@@ -1,58 +1,44 @@
-import { loadQAStuffChain } from "langchain/chains";
-import { FaissStore } from "langchain/vectorstores/faiss";
+import { HNSWLib } from "langchain/vectorstores/hnswlib";
+
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { OpenAIChat } from "langchain/llms/openai";
-import { Document } from "langchain/document";
-import { MarkdownTextSplitter } from "langchain/text_splitter";
-import { documentation, references } from "./sources.js";
+import { SelfQueryRetriever } from "langchain/retrievers/self_query";
+import { FunctionalTranslator } from "langchain/retrievers/self_query/functional";
+import { OpenAI, OpenAIChat } from "langchain/llms/openai";
+import { loadQAStuffChain } from "langchain/chains";
+import { getDocuments, documentContents, attributeInfo } from "./documents.js";
 
-async function chunkSources(sources) {
-  const sourceChunks = [];
-  const splitter = new MarkdownTextSplitter({
-    chunk_size: 1024,
-    chunk_overlap: 64,
+export const intializeDocumentRetriever = async () => {
+  const embeddings = new OpenAIEmbeddings({
+    openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
   });
 
-  for (const source of sources) {
-    for (const chunk of await splitter.splitText(source.pageContent)) {
-      sourceChunks.push(
-        new Document({
-          pageContent: chunk,
-          metadata: source.metadata,
-        })
-      );
-    }
-  }
+  const documents = await getDocuments();
+  const vectorStore = await HNSWLib.fromDocuments(documents, embeddings);
 
-  return sourceChunks;
-}
-
-export const initializeSearchIndex = async () => {
-  const sources = [...documentation, ...references].map((page) => {
-    return new Document({
-      pageContent: page.contents,
-      metadata: page.metadata,
-    });
-  });
-
-  return FaissStore.fromDocuments(
-    await chunkSources(sources),
-    new OpenAIEmbeddings({
+  return await SelfQueryRetriever.fromLLM({
+    llm: new OpenAI({
       openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-    })
-  );
+      temperature: 0.3,
+      maxTokens: 1000,
+    }),
+    vectorStore,
+    documentContents,
+    attributeInfo,
+    structuredQueryTranslator: new FunctionalTranslator(),
+    verbose: true,
+  });
 };
 
-export const getChain = (handleLLMNewToken) => {
+export const getChain = async (onToken) => {
   return loadQAStuffChain(
     new OpenAIChat({
       openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
       temperature: 0.3,
-      max_tokens: 1000,
+      maxTokens: 1000,
       streaming: true,
       callbacks: [
         {
-          handleLLMNewToken,
+          handleLLMNewToken: onToken,
         },
       ],
     })

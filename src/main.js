@@ -2,7 +2,7 @@ import "dotenv/config";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-import { getChain, initializeSearchIndex } from "./embeddings.js";
+import { getChain, intializeDocumentRetriever } from "./embeddings.js";
 
 const app = express();
 app.use(
@@ -12,17 +12,18 @@ app.use(
 );
 app.use(bodyParser.raw({ inflate: true, type: "*/*" }));
 
-let searchIndex = null;
+/** @type {import("langchain/retrievers/self_query").SelfQueryRetriever?} */
+let retriever = null;
 
 const port = 3003;
 
 const template = (
   prompt
-) => `You are an AI chat bot trained on Appwrite Docs. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer from the reference docs. For each question show code examples when applicable. Unless otherwise specified, you should provide examples using the Node and Web SDKs.
+) => `You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.
 ${prompt}`;
 
 app.post("/", async (req, res) => {
-  if (!searchIndex) {
+  if (!retriever) {
     res.status(500).send("Search index not initialized");
     return;
   }
@@ -32,15 +33,23 @@ app.post("/", async (req, res) => {
   const { prompt } = JSON.parse(text);
   const templated = template(prompt);
 
-  const inputDocuments = await searchIndex.similaritySearch(prompt, 5);
+  const relevantDocuments = await retriever.getRelevantDocuments(prompt);
+
   const chain = await getChain((token) => {
     res.write(token);
   });
 
   await chain.call({
-    input_documents: inputDocuments,
+    input_documents: relevantDocuments,
     question: templated,
   });
+
+  res.write("\n\nSources:\n");
+  for (const sourceUrl of new Set(
+    relevantDocuments.map((d) => d.metadata.url)
+  )) {
+    res.write("-" + sourceUrl + "\n");
+  }
 
   res.end();
 });
@@ -49,7 +58,7 @@ app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
   console.log("Initializing search index...");
   try {
-    searchIndex = await initializeSearchIndex();
+    retriever = await intializeDocumentRetriever();
     console.log("Search index initialized");
   } catch (e) {
     console.error(e);

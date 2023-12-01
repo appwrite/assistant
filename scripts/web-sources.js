@@ -45,13 +45,15 @@ for (const sdk of SDKS) {
 
   for (const service of SERVICES) {
     const url = `https://appwrite.io/docs/references/cloud/${sdk}/${service}`;
-
     const response = await fetch(url);
+
     const html = await response.text();
+    if (!html) continue;
 
-    const article = html.match(/<main class="u-contents">(.|\n)*<\/main>/)[0];
-    const markdown = NodeHtmlMarkdown.translate(article);
+    const matches = html.match(/<h1>(.|\n)*<\/h1>/);
+    if (!matches || !matches[0]) continue;
 
+    const markdown = NodeHtmlMarkdown.translate(matches[0]);
     await writeFile(`./sources/references/${sdk}/${service}.md`, markdown);
   }
 }

@@ -1,29 +1,26 @@
-To use the users API to create a new user with Dart, you can use the `createArgon2User` method from the `Users` class. Here is an example code snippet:
+To create a new user using the Appwrite users API with Dart, you can use the following code:
 
 ```dart
-import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:appwrite/appwrite.dart';
 
-void main() {
+void main() async {
   Client client = Client();
-  Users users = Users(client);
+  client.setEndpoint('https://[HOSTNAME_OR_IP]/v1'); // Replace with your Appwrite endpoint
 
-  client
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('YOUR_PROJECT_ID')
-    .setKey('YOUR_API_KEY');
-
-  Future result = users.createArgon2User(
-    userId: 'USER_ID',
-    email: 'email@example.com',
-    password: 'password',
-  );
-
-  result.then((response) {
-    print(response);
-  }).catchError((error) {
-    print(error.response);
-  });
+  Account account = Account(client);
+  try {
+    Response response = await account.create(
+      email: 'user@example.com',
+      password: 'password',
+      name: 'John Doe',
+    );
+    print(response.data);
+  } catch (e) {
+    print(e);
+  }
 }
 ```
 
-Make sure to replace `YOUR_PROJECT_ID` with your actual project ID and `YOUR_API_KEY` with your secret API key.
+Make sure to replace `[HOSTNAME_OR_IP]` with your Appwrite endpoint. You can find more information about the users API in the Appwrite documentation: [Users API Reference](https://appwrite.io/docs/users).
+
+Sources:

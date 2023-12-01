@@ -1,0 +1,166 @@
+import { glob } from "glob";
+import { readFile } from "fs/promises";
+import { Document } from "langchain/document";
+import { MarkdownTextSplitter } from "langchain/text_splitter";
+
+const getDocumentation = async () => {
+  const filenames = await glob([
+    "./sources/website/src/routes/docs/**/*.markdoc",
+    "./sources/website/src/routes/docs/**/*.md",
+    "./sources/website/src/partials/**/*.md",
+  ]);
+
+  return Promise.all(
+    filenames.map(async (filename) => {
+      const contents = await readFile(filename, { encoding: "utf8" });
+
+      const metadata = {
+        filename,
+        url:
+          filename.startsWith("sources/website/src/routes/") &&
+          filename.endsWith("+page.markdoc")
+            ? `https://appwrite.io/${filename
+                .replace("sources/website/src/routes/", "")
+                .replace("+page.markdoc", "")}`
+            : null,
+        type: "documentation",
+        ...parseMarkdownFrontmatter(contents),
+      };
+
+      return new Document({
+        metadata,
+        pageContent: cleanMarkdoc(contents, metadata.url),
+      });
+    })
+  );
+};
+
+const getReferences = async () => {
+  const filenames = await glob(["./sources/references/**/*.md"]);
+
+  return Promise.all(
+    filenames.map(async (filename) => {
+      const contents = await readFile(filename, { encoding: "utf8" });
+
+      const metadata = {
+        filename,
+        url: `https://appwrite.io/docs/references/cloud/${filename
+          .replace("sources/references/", "")
+          .replace(".md", "")}`,
+        type: "reference",
+      };
+
+      return new Document({
+        metadata,
+        pageContent: cleanMarkdoc(contents, metadata.url),
+      });
+    })
+  );
+};
+
+export const getDocuments = async () => {
+  const documentation = await getDocumentation();
+  const references = await getReferences();
+
+  return await splitDocuments([...documentation, ...references]);
+};
+
+export const documentContents =
+  "Markdown text from the Appwrite documentation and reference pages.";
+
+export const attributeInfo = [
+  {
+    name: "url",
+    type: "url string",
+    description: "The URL source of the document",
+  },
+  {
+    name: "filename",
+    type: "string",
+    description: "The filename source of the document",
+  },
+  {
+    name: "type",
+    type: "string",
+    description:
+      "The type of the document, either 'documentation' or 'reference'. Documentation pages contain longer form content, while reference pages contain specifc API documentation.",
+  },
+  {
+    name: "title",
+    type: "string|undefined",
+    description:
+      "The title of the documentation page. Only available for documentation pages.",
+  },
+  {
+    name: "description",
+    type: "string|undefined",
+    description:
+      "The description of the documentation page. Only available for documentation pages.",
+  },
+];
+
+/**x
+ * @param {Document[]} documents
+ * @returns {Promise<Document<Record<string, any>>[]>}
+ */
+async function splitDocuments(documents) {
+  const splitter = new MarkdownTextSplitter({
+    chunkSize: 1024,
+    chunkOverlap: 64,
+  });
+
+  const texts = documents.map((document) => document.pageContent);
+  const metadatas = documents.map((document) => document.metadata);
+
+  return await splitter.createDocuments(texts, metadatas);
+}
+
+function parseMarkdownFrontmatter(contents) {
+  const raw = contents.match(/^---\n([\s\S]*?)\n---/);
+  if (!raw) {
+    return {};
+  }
+  const frontmatterLines = raw[1].split("\n");
+  const frontmatter = {};
+  for (const line of frontmatterLines) {
+    const [key, value] = line.split(": ");
+    frontmatter[key] = value;
+  }
+  return frontmatter;
+}
+
+/**
+ * Clean up markdoc contents to make them more suitable for search.
+ *
+ * @param {string} contents
+ * @param {string|null} currentUrl
+ */
+function cleanMarkdoc(contents, currentUrl = null) {
+  return (
+    contents
+      // Remove the frontmatter
+      // e.g.
+      ///---
+      // title: Getting Started
+      // ---
+      .replace(/^---\n([\s\S]*?)\n---/, "")
+      // Remove markdoc components
+      // e.g. {% component foo="bar" %}
+      .replace(/{% [\s\S]*? %}/g, "")
+      // Remove links to images
+      // e.g. ![image](./image.png)
+      .replace(/!\[[^\]]*\]\((?!http)([^\)]*)\)/g, "")
+      // Replace relative heading links with absolute links
+      // e.g. [Getting Started](#getting-started) -> [Getting Started](https://appwrite.io/docs/current-page#getting-started)
+      .replace(/\[([^\]]*)\]\((?!http)([^\)]*)\)/g, (_, p1, p2) => {
+        if (!currentUrl) return "";
+        return `[${p1}](${currentUrl}#${p2})`;
+      })
+      // Replace relative links with absolute links
+      // e.g. [Databases](/docs/products/databases) -> [Databases][(https://appwrite.io/docs/products/databases)
+      .replace(/\[([^\]]*)\]\((?!http)([^\)]*)\)/g, (_, p1, p2) => {
+        if (!currentUrl) return "";
+        return `[${p1}](${new URL(currentUrl).origin}/${p2})`;
+      })
+  );
+}
