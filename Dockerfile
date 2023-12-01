@@ -11,9 +11,9 @@ RUN pnpm --prod install
 
 COPY . .
 
-RUN git submodule update --init --recursive
+RUN pnpm run fetch-sources
 
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 
 EXPOSE 3003
-CMD [ "node", "main.js" ]
+CMD [ "pnpm", "start" ]

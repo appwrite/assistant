@@ -1,8 +1,8 @@
+import "dotenv/config";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import { getChain, initializeSearchIndex } from "./embeddings.js";
-import "dotenv/config";
 
 const app = express();
 app.use(
@@ -32,16 +32,10 @@ app.post("/", async (req, res) => {
   const { prompt } = JSON.parse(text);
   const templated = template(prompt);
 
-  const inputDocuments = await searchIndex.similaritySearch(prompt, 4);
-  if (process.env.DEBUG) {
-    res.write("Prompt: " + templated + "\n\n");
-
-    for (const doc of inputDocuments) {
-      res.write("Using source: " + doc.metadata.url + "\n");
-      res.write(doc.pageContent + "\n\n");
-    }
-
-    res.write("Completion: ");
+  const inputDocuments = await searchIndex.similaritySearch(prompt, 5);
+  for (const inputDocument of inputDocuments) {
+    res.write(`Using source: `);
+    res.write(`- ${inputDocument.metadata.filename}\n`);
   }
 
   const chain = await getChain((token) => {

@@ -4,10 +4,10 @@ import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { OpenAIChat } from "langchain/llms/openai";
 import { Document } from "langchain/document";
 import { MarkdownTextSplitter } from "langchain/text_splitter";
-import { documentation } from "./scrape.js";
+import { documentation, references } from "./sources.js";
 
-async function chunk_sources(sources) {
-  const source_chunks = [];
+async function chunkSources(sources) {
+  const sourceChunks = [];
   const splitter = new MarkdownTextSplitter({
     chunk_size: 1024,
     chunk_overlap: 64,
@@ -15,7 +15,7 @@ async function chunk_sources(sources) {
 
   for (const source of sources) {
     for (const chunk of await splitter.splitText(source.pageContent)) {
-      source_chunks.push(
+      sourceChunks.push(
         new Document({
           pageContent: chunk,
           metadata: source.metadata,
@@ -24,11 +24,11 @@ async function chunk_sources(sources) {
     }
   }
 
-  return source_chunks;
+  return sourceChunks;
 }
 
 export const initializeSearchIndex = async () => {
-  const sources = documentation.map((page) => {
+  const sources = [...documentation, ...references].map((page) => {
     return new Document({
       pageContent: page.contents,
       metadata: page.metadata,
@@ -36,7 +36,7 @@ export const initializeSearchIndex = async () => {
   });
 
   return FaissStore.fromDocuments(
-    await chunk_sources(sources),
+    await chunkSources(sources),
     new OpenAIEmbeddings({
       openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
     })
