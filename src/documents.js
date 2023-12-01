@@ -14,16 +14,17 @@ const getDocumentation = async () => {
     filenames.map(async (filename) => {
       const contents = await readFile(filename, { encoding: "utf8" });
 
+      const url =
+        filename.startsWith("sources/website/src/routes/") &&
+        filename.endsWith("+page.markdoc")
+          ? `https://appwrite.io/${filename
+              .replace("sources/website/src/routes/", "")
+              .replace("+page.markdoc", "")}`
+          : null;
+
       const metadata = {
         filename,
-        url:
-          filename.startsWith("sources/website/src/routes/") &&
-          filename.endsWith("+page.markdoc")
-            ? `https://appwrite.io/${filename
-                .replace("sources/website/src/routes/", "")
-                .replace("+page.markdoc", "")}`
-            : null,
-        type: "documentation",
+        url,
         ...parseMarkdownFrontmatter(contents),
       };
 
@@ -42,12 +43,10 @@ const getReferences = async () => {
     filenames.map(async (filename) => {
       const contents = await readFile(filename, { encoding: "utf8" });
 
+      const { sdk, service } = parseReferenceData(filename);
       const metadata = {
         filename,
-        url: `https://appwrite.io/docs/references/cloud/${filename
-          .replace("sources/references/", "")
-          .replace(".md", "")}`,
-        type: "reference",
+        url: `https://appwrite.io/docs/references/cloud/${sdk}/${service}`,
       };
 
       return new Document({
@@ -64,40 +63,6 @@ export const getDocuments = async () => {
 
   return await splitDocuments([...documentation, ...references]);
 };
-
-export const documentContents =
-  "Markdown text from the Appwrite documentation and reference pages.";
-
-export const attributeInfo = [
-  {
-    name: "url",
-    type: "url string",
-    description: "The URL source of the document",
-  },
-  {
-    name: "filename",
-    type: "string",
-    description: "The filename source of the document",
-  },
-  {
-    name: "type",
-    type: "string",
-    description:
-      "The type of the document, either 'documentation' or 'reference'. Documentation pages contain longer form content, while reference pages contain specifc API documentation.",
-  },
-  {
-    name: "title",
-    type: "string|undefined",
-    description:
-      "The title of the documentation page. Only available for documentation pages.",
-  },
-  {
-    name: "description",
-    type: "string|undefined",
-    description:
-      "The description of the documentation page. Only available for documentation pages.",
-  },
-];
 
 /**x
  * @param {Document[]} documents
@@ -127,6 +92,14 @@ function parseMarkdownFrontmatter(contents) {
     frontmatter[key] = value;
   }
   return frontmatter;
+}
+
+function parseReferenceData(filename) {
+  const [sdk, service] = filename
+    .replace("sources/references/", "")
+    .replace(".md", "")
+    .split("/");
+  return { sdk, service };
 }
 
 /**

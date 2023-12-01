@@ -1,42 +1,46 @@
 To set up database collections and documents in Appwrite, you can follow these steps:
 
-1. Create a collection: You can create a collection using the Appwrite Console or the Server SDK. In the Appwrite Console, go to the **Databases** page, navigate to a database, and click **Create collection**. You can also use the Server SDK to create a collection programmatically.
+1. Create a database: Head to your Appwrite Console and create a new database. You can name it `Oscar` and optionally add a custom database ID.
 
-2. Grant create permissions: Before users can create documents, you need to grant them **create** permissions at the collection level. You can learn more about permissions in the [Appwrite documentation](https://appwrite.io/docs/products/databases/documents/##permissions).
+2. Create a collection: Within the `Oscar` database, click on **Create collection**. Name the collection `My books` and optionally add a custom collection ID.
 
-3. Create documents programmatically: In most use cases, you will create documents programmatically using the Server SDK. Here's an example in JavaScript:
+3. Define collection attributes: Navigate to the **Attributes** section of the collection and click on **Create attribute**. Select the attribute type, such as **String**, and enter the attribute key and size. For example, you can create an attribute with the key `title` and size `100`.
 
-```js
-import { Client, Databases, ID } from "appwrite";
+4. Set permissions: Go to the **Settings** > **Permissions** section and add a new role called **Any**. Check the **CREATE** and **READ** permissions for this role to allow anyone to create and read documents.
 
-const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('<PROJECT_ID>');
+5. Create a document: To create a document, you can use the `createDocument` method provided by the Appwrite SDK. Replace `<PROJECT_ID>` with your project ID, `<DATABASE_ID>` with the ID of the `Oscar` database, and `<COLLECTION_ID>` with the ID of the `My books` collection.
 
-const databases = new Databases(client);
+Here's an example of creating a document using the Node.js SDK:
 
-const promise = databases.createDocument(
-    '[DATABASE_ID]',
-    '[COLLECTION_ID]',
-    ID.unique(),
-    {}
+```javascript
+const appwrite = require("appwrite");
+
+const sdk = new appwrite.SDK();
+
+sdk
+  .setEndpoint('https://[HOSTNAME_OR_IP]/v1') // Replace with your Appwrite endpoint
+  .setProject('<PROJECT_ID>') // Replace with your project ID
+  .setKey('<API_KEY>'); // Replace with your API key
+
+const document = sdk.createDocument(
+  '<DATABASE_ID>',
+  '<COLLECTION_ID>',
+  { title: 'My Book Title', author: 'John Doe' }
 );
 
-promise.then(function (response) {
-    console.log(response);
-}, function (error) {
-    console.log(error);
+document.then((response) => {
+  console.log(response); // The created document object
+}).catch((error) => {
+  console.error(error); // Handle any errors
 });
 ```
 
-This example creates a new document in the specified database and collection. The `ID.unique()` function generates a unique document ID, and the empty object `{}` represents the document data. You can customize the document data as per your requirements.
+Note: Make sure to replace the placeholders (`[HOSTNAME_OR_IP]`, `<PROJECT_ID>`, `<API_KEY>`, `<DATABASE_ID>`, `<COLLECTION_ID>`) with your actual values.
 
-Remember to replace `[PROJECT_ID]`, `[DATABASE_ID]`, and `[COLLECTION_ID]` with your actual project, database, and collection IDs.
-
-That's how you can set up database collections and create documents in Appwrite.
+You can find more information about setting up database collections and documents in the [Appwrite Databases documentation](https://appwrite.io/docs/references/cloud/client-web/databases#/docs/products/databases/collections).
 
 Sources:
--null
 -https://appwrite.io/docs/products/databases/collections/
--https://appwrite.io/docs/products/databases/documents/
--https://appwrite.io/docs/products/databases/pagination/
+-https://appwrite.io/docs/products/databases/quick-start/
+-https://appwrite.io/docs/references/cloud/server-java/databases
+-https://appwrite.io/docs/references/cloud/client-web/databases

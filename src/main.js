@@ -2,7 +2,10 @@ import "dotenv/config";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-import { getChain, intializeDocumentRetriever } from "./embeddings.js";
+import {
+  getChain,
+  intializeDocumentRetriever as initializeRetriever,
+} from "./embeddings.js";
 
 const app = express();
 app.use(
@@ -12,7 +15,7 @@ app.use(
 );
 app.use(bodyParser.raw({ inflate: true, type: "*/*" }));
 
-/** @type {import("langchain/retrievers/self_query").SelfQueryRetriever?} */
+/** @type {import("langchain/schema/retriever").BaseRetriever?} */
 let retriever = null;
 
 const port = 3003;
@@ -44,11 +47,17 @@ app.post("/", async (req, res) => {
     question: templated,
   });
 
-  res.write("\n\nSources:\n");
-  for (const sourceUrl of new Set(
-    relevantDocuments.map((d) => d.metadata.url)
-  )) {
-    res.write("-" + sourceUrl + "\n");
+  const sources = new Set(
+    relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url)
+  );
+
+  if (sources.size > 0) {
+    res.write("\n\nSources:\n");
+    for (const sourceUrl of new Set(
+      relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url)
+    )) {
+      res.write("-" + sourceUrl + "\n");
+    }
   }
 
   res.end();
@@ -58,7 +67,7 @@ app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
   console.log("Initializing search index...");
   try {
-    retriever = await intializeDocumentRetriever();
+    retriever = await initializeRetriever();
     console.log("Search index initialized");
   } catch (e) {
     console.error(e);

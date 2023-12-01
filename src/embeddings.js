@@ -1,11 +1,8 @@
 import { HNSWLib } from "langchain/vectorstores/hnswlib";
-
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { SelfQueryRetriever } from "langchain/retrievers/self_query";
-import { FunctionalTranslator } from "langchain/retrievers/self_query/functional";
-import { OpenAI, OpenAIChat } from "langchain/llms/openai";
+import { OpenAIChat } from "langchain/llms/openai";
 import { loadQAStuffChain } from "langchain/chains";
-import { getDocuments, documentContents, attributeInfo } from "./documents.js";
+import { getDocuments } from "./documents.js";
 
 export const intializeDocumentRetriever = async () => {
   const embeddings = new OpenAIEmbeddings({
@@ -15,18 +12,7 @@ export const intializeDocumentRetriever = async () => {
   const documents = await getDocuments();
   const vectorStore = await HNSWLib.fromDocuments(documents, embeddings);
 
-  return await SelfQueryRetriever.fromLLM({
-    llm: new OpenAI({
-      openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-      temperature: 0.3,
-      maxTokens: 1000,
-    }),
-    vectorStore,
-    documentContents,
-    attributeInfo,
-    structuredQueryTranslator: new FunctionalTranslator(),
-    verbose: true,
-  });
+  return vectorStore.asRetriever(5);
 };
 
 export const getChain = async (onToken) => {

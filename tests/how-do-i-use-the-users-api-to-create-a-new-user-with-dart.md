@@ -1,26 +1,34 @@
-To create a new user using the Appwrite users API with Dart, you can use the following code:
+To create a new user with Dart using the users API, you can use the `create` method provided by the `Users` class. Here is an example code snippet:
 
 ```dart
-import 'package:appwrite/appwrite.dart';
+import 'package:dart_appwrite/dart_appwrite.dart';
 
-void main() async {
+void main() {
   Client client = Client();
-  client.setEndpoint('https://[HOSTNAME_OR_IP]/v1'); // Replace with your Appwrite endpoint
+  Users users = Users(client);
 
-  Account account = Account(client);
-  try {
-    Response response = await account.create(
-      email: 'user@example.com',
-      password: 'password',
-      name: 'John Doe',
-    );
-    print(response.data);
-  } catch (e) {
-    print(e);
-  }
+  client
+    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+    .setProject('YOUR_PROJECT_ID') // Your project ID
+    .setKey('YOUR_API_KEY') // Your secret API key
+  ;
+
+  Future result = users.create(
+    userId: 'YOUR_USER_ID',
+    email: 'email@example.com',
+    password: 'password',
+    name: 'John Doe',
+  );
+
+  result.then((response) {
+    print(response);
+  }).catchError((error) {
+    print(error.response);
+  });
 }
 ```
 
-Make sure to replace `[HOSTNAME_OR_IP]` with your Appwrite endpoint. You can find more information about the users API in the Appwrite documentation: [Users API Reference](https://appwrite.io/docs/users).
+Make sure to replace `'YOUR_PROJECT_ID'` and `'YOUR_API_KEY'` with your actual project ID and secret API key. You can also customize the values for `userId`, `email`, `password`, and `name` according to your requirements.
 
 Sources:
+-https://appwrite.io/docs/references/cloud/server-dart/users

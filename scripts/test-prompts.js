@@ -1,18 +1,22 @@
 import { writeFile, mkdir } from "fs/promises";
 
 const SERVER_URL = "http://localhost:3003/";
+
 const PROMPTS = [
   "How do you add a custom domain in the console?",
   "Show me how I can set up database collections and documents.",
   "What's the difference between Server and Client SDKs?",
   "How do I use the users API to create a new user with Dart?",
+  "What endpoints are available for the Avatars API? I'm using the PHP SDK",
+  "How to use Appwrite with React?",
 ];
+
 const TESTS_FOLDER = "./tests";
 
 await mkdir(TESTS_FOLDER, { recursive: true });
 
 for (const prompt of PROMPTS) {
-  console.log(`Executing prompt: ${prompt}\n`);
+  console.log(`Executing prompt: ${prompt}`);
 
   const response = await fetch(SERVER_URL, {
     method: "POST",
