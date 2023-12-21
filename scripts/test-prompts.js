@@ -1,7 +1,6 @@
 import { writeFile, mkdir } from "fs/promises";
 
 const SERVER_URL = "http://localhost:3003/";
-
 const PROMPTS = [
   "How do you add a custom domain in the console?",
   "Show me how I can set up database collections and documents.",
@@ -10,7 +9,6 @@ const PROMPTS = [
   "What endpoints are available for the Avatars API? I'm using the PHP SDK",
   "How to use Appwrite with React?",
 ];
-
 const TESTS_FOLDER = "./tests";
 
 await mkdir(TESTS_FOLDER, { recursive: true });
@@ -24,6 +22,8 @@ for (const prompt of PROMPTS) {
       prompt,
     }),
   });
+
+  if (!response.ok) throw new Error(response.statusText);
 
   const text = await response.text();
 

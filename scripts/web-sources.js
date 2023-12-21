@@ -48,13 +48,23 @@ for (const sdk of SDKS) {
     const response = await fetch(url);
 
     const html = await response.text();
-    if (!html) continue;
+    if (!html) {
+      console.warn(`Skipping page ${url} - no content found`);
+      continue;
+    }
 
     // Ignore the header and footer
-    const matches = html.match(/<main class="u-contents">(.|\n)*<\/main>/);
-    if (!matches || !matches[0]) continue;
+    const matches = html.match(
+      /<main class="u-contents" id="main">(.*?)<\/main>/s
+    );
+    if (!matches || !matches[0]) {
+      console.warn(`Skipping page ${url} - no <main> tag found`);
+      continue;
+    }
 
     const markdown = NodeHtmlMarkdown.translate(matches[0]);
+
     await writeFile(`./sources/references/${sdk}/${service}.md`, markdown);
+    console.log(`Created ./sources/references/${sdk}/${service}.md`);
   }
 }

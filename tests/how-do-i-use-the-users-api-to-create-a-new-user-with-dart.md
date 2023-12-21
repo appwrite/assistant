@@ -1,4 +1,4 @@
-To create a new user with Dart using the users API, you can use the `create` method provided by the `Users` class. Here is an example code snippet:
+To create a new user with the users API in Dart, you can use the `create` method from the `Users` class. Here is an example code snippet:
 
 ```dart
 import 'package:dart_appwrite/dart_appwrite.dart';
@@ -9,26 +9,26 @@ void main() {
 
   client
     .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-    .setProject('YOUR_PROJECT_ID') // Your project ID
-    .setKey('YOUR_API_KEY') // Your secret API key
+    .setProject('5df5acd0d48c2') // Your project ID
+    .setKey('919c2d18fb5d4...a2ae413da83346ad2') // Your secret API key
   ;
 
   Future result = users.create(
-    userId: 'YOUR_USER_ID',
+    userId: '[USER_ID]',
     email: 'email@example.com',
     password: 'password',
-    name: 'John Doe',
   );
 
-  result.then((response) {
-    print(response);
-  }).catchError((error) {
-    print(error.response);
+  result
+    .then((response) {
+      print(response);
+    }).catchError((error) {
+      print(error.response);
   });
 }
 ```
 
-Make sure to replace `'YOUR_PROJECT_ID'` and `'YOUR_API_KEY'` with your actual project ID and secret API key. You can also customize the values for `userId`, `email`, `password`, and `name` according to your requirements.
+Make sure to replace `[USER_ID]` with the desired user ID, and provide the appropriate values for `email` and `password`.
 
 Sources:
--https://appwrite.io/docs/references/cloud/server-dart/users
+- https://appwrite.io/docs/references/cloud/server-dart/users
