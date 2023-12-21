@@ -56,7 +56,7 @@ app.post("/", async (req, res) => {
     for (const sourceUrl of new Set(
       relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url)
     )) {
-      res.write("-" + sourceUrl + "\n");
+      res.write("- " + sourceUrl + "\n");
     }
   }
 
