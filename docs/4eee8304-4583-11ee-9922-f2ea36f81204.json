@@ -1,1 +1,0 @@
-{"page_content": "[{\"level\": 1, \"title\": \" Country Object \", \"body\": []}, {\"level\": 2, \"title\": \"Properties\", \"body\": [\"   Name Type Description      name   string  Country name.    code   string  Country two-character ISO 3166-1 alpha code.  \"]}]", "metadata": {"source": "http://167.172.175.165:2080/docs/models/country"}}

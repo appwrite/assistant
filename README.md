@@ -16,14 +16,28 @@ To install, run the following command.
 pnpm i
 ```
 
-## Usage
-
-To run the server, execute the `main.js` file with node, or run the `dev` command to hot-restart the server on file changes.
+Next, fetch the Appwrite-specific sources used by the assistant.
 
 ```bash
-node main.js
-# Or
+pnpm run fetch-sources
+```
+
+This will download the sources from the Appwrite documentation and store them in the `./sources` directory.
+
+## Usage
+
+To run the server, execute the `dev` command. By default, the server will be available at `http://localhost:3000` 
+
+```bash
 pnpm run dev
+```
+
+The server exposes a POST endpoint at `/`. The endpoint expects a raw text body containing the query for the assistant. The answer to the query will be streamed back to the client as raw text.
+
+Use cURL to test the server, for example:
+
+```bash
+curl -X POST -d "How do I create a user?" http://localhost:3000
 ```
 
 ## Contributing
