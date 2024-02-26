@@ -29,7 +29,7 @@ Add a `.env` file by copying the `.env.example` file as a template in the projec
 Finally, start a development server:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### 4. Testing the changes
@@ -41,7 +41,7 @@ We use a set of benchmark questions to test your changes:
 - What's the difference between Server and Client SDKs?
 - How do I use the users API to create a new user with Dart?
 
-You can execute the [npm run test](./scripts/test-prompts.js) script to write snapshots of the answers to these questions to the tests folder.
+You can execute the [pnpm run test](./scripts/test-prompts.js) script to write snapshots of the answers to these questions to the tests folder.
 
 ## Submit a Pull Request 🚀
 
@@ -113,17 +113,6 @@ Don't use `@fixme`, which defines things that are broken. Don't commit broken co
 Please avoid introducing new dependencies to Appwrite without consulting the team. New dependencies can be very helpful, but they also introduce new security and privacy issues, complexity, and impact total docker image size.
 
 Adding a new dependency should contribute vital value to the product with minimum possible risk.
-
-## Updating the Documentation
-
-We created a python script, located at `scrape.py`, that fetches various links in the Appwrite documentation, and saves them to JSON files in the `docs` folder. To run the script, execute the following command.
-
-```bash
-python3 -m pip install -r requirements.txt
-python3 scrape.py
-```
-
-To update the documentation, you can change which files are fetched by editing the `scrape.py` file.
 
 ## Introducing New Features
 
