@@ -6,14 +6,14 @@ import { NodeHtmlMarkdown } from "node-html-markdown";
 const WEBSITE_URL = process.env._BUILD_WEBSITE_URL ?? "https://appwrite.io";
 if (!WEBSITE_URL) {
   console.warn(
-    `Missing environment variable _BUILD_WEBSITE_URL - using ${WEBSITE_URL}`
+    `No environment variable _BUILD_WEBSITE_URL - using ${WEBSITE_URL}`
   );
 }
 
 const WEBSITE_VERSION = process.env._BUILD_WEBSITE_VERSION ?? "cloud";
 if (!WEBSITE_VERSION) {
   console.warn(
-    `Missing environment variable _BUILD_WEBSITE_VERSION - using ${WEBSITE_VERSION}`
+    `No environment variable _BUILD_WEBSITE_VERSION - using ${WEBSITE_VERSION}`
   );
 }
 

@@ -5,9 +5,7 @@ import { execa } from "execa";
 const GIT_URL =
   process.env._BUILD_GIT_URL ?? "https://github.com/appwrite/website.git";
 if (!GIT_URL) {
-  console.warn(
-    `Missing environment variable _BUILD_GIT_URL - using ${GIT_URL}`
-  );
+  console.warn(`No environment variable _BUILD_GIT_URL - using ${GIT_URL}`);
 }
 
 const GIT_BRANCH = process.env._BUILD_GIT_BRANCH ?? "main";
