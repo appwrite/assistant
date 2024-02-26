@@ -1,6 +1,21 @@
+import "dotenv/config";
 import { mkdir, writeFile } from "fs/promises";
 import { execa } from "execa";
 import { NodeHtmlMarkdown } from "node-html-markdown";
+
+const WEBSITE_URL = process.env._BUILD_WEBSITE_URL ?? "https://appwrite.io";
+if (!WEBSITE_URL) {
+  console.warn(
+    `Missing environment variable _BUILD_WEBSITE_URL - using ${WEBSITE_URL}`
+  );
+}
+
+const WEBSITE_VERSION = process.env._BUILD_WEBSITE_VERSION ?? "cloud";
+if (!WEBSITE_VERSION) {
+  console.warn(
+    `Missing environment variable _BUILD_WEBSITE_VERSION - using ${WEBSITE_VERSION}`
+  );
+}
 
 const LOCAL_PATH = "./sources/references";
 const SDKS = [
@@ -44,8 +59,12 @@ for (const sdk of SDKS) {
   await mkdir(`./sources/references/${sdk}/`, { recursive: true });
 
   for (const service of SERVICES) {
-    const url = `https://appwrite.io/docs/references/cloud/${sdk}/${service}`;
-    const response = await fetch(url);
+    const url = new URL(
+      `/docs/references/${WEBSITE_VERSION}/${sdk}/${service}`,
+      WEBSITE_URL
+    );
+
+    const response = await fetch(url.toString());
 
     const html = await response.text();
     if (!html) {

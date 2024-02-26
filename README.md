@@ -16,15 +16,23 @@ To install, run the following command.
 pnpm i
 ```
 
-Next, fetch the Appwrite-specific sources used by the assistant.
+Next, fetch the Appwrite-specific sources used by the assistant. This will download the sources from the Appwrite documentation and store them in the `./sources` directory.
 
 ```bash
 pnpm run fetch-sources
 ```
 
-This will download the sources from the Appwrite documentation and store them in the `./sources` directory.
+Tthe scripts will pull the latest documentation from the `main` branch of the [website repository](https://github.com/appwrite/website), and the latest API reference from live [Appwrite documentation](https://appwrite.io/docs). 
+
+If you want to pull from a different branch or repository, you can set the `_BUILD_GIT_URL` and `_BUILD_WEBSITE_URL` environment variables.
+
+```bash
 
 ## Usage
+
+First, retrieve an API key from OpenAI. You can sign up for an API key at [OpenAI](https://beta.openai.com/signup/). Once you have an API key, set it as the `_APP_ASSISTANT_OPENAI_API_KEY` environment variable.
+
+```bash
 
 To run the server, execute the `dev` command. By default, the server will be available at `http://localhost:3000` 
 
