@@ -32,8 +32,6 @@ If you want to pull from a different branch or repository, you can set the `_BUI
 
 First, retrieve an API key from OpenAI. You can sign up for an API key at [OpenAI](https://beta.openai.com/signup/). Once you have an API key, set it as the `_APP_ASSISTANT_OPENAI_API_KEY` environment variable.
 
-```bash
-
 To run the server, execute the `dev` command. By default, the server will be available at `http://localhost:3000` 
 
 ```bash
