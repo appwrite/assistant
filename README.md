@@ -26,8 +26,6 @@ The scripts will pull the latest documentation from the `main` branch of the [we
 
 If you want to pull from a different branch or repository, you can set the `_BUILD_GIT_URL` and `_BUILD_WEBSITE_URL` environment variables.
 
-```bash
-
 ## Usage
 
 First, retrieve an API key from OpenAI. You can sign up for an API key at [OpenAI](https://beta.openai.com/signup/). Once you have an API key, set it as the `_APP_ASSISTANT_OPENAI_API_KEY` environment variable.
