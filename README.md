@@ -22,7 +22,7 @@ Next, fetch the Appwrite-specific sources used by the assistant. This will downl
 pnpm run fetch-sources
 ```
 
-Tthe scripts will pull the latest documentation from the `main` branch of the [website repository](https://github.com/appwrite/website), and the latest API reference from live [Appwrite documentation](https://appwrite.io/docs). 
+The scripts will pull the latest documentation from the `main` branch of the [website repository](https://github.com/appwrite/website), and the latest API reference from live [Appwrite documentation](https://appwrite.io/docs). 
 
 If you want to pull from a different branch or repository, you can set the `_BUILD_GIT_URL` and `_BUILD_WEBSITE_URL` environment variables.
 
