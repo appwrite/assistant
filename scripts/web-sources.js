@@ -45,6 +45,7 @@ const SERVICES = [
   "databases",
   "functions",
   "locale",
+  "messaging",
   "storage",
   "teams",
   "users",
