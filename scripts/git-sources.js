@@ -25,9 +25,13 @@ const FILES = [
 await execa("rm", ["-rf", LOCAL_PATH]);
 await mkdir(LOCAL_PATH, { recursive: true });
 
-console.log(`Cloning ${GIT_URL} to ${LOCAL_PATH}...`);
-
-await execa("git", ["clone", "--no-checkout", GIT_URL, LOCAL_PATH]);
+await execa(
+  "git",
+  ["clone", "--no-checkout", "--depth", "1", GIT_URL, LOCAL_PATH],
+  {
+    stdio: "inherit",
+  }
+);
 
 await mkdir(`${LOCAL_PATH}/.git/info`, { recursive: true });
 await writeFile(`${LOCAL_PATH}/.git/info/sparse-checkout`, FILES.join("\n"));

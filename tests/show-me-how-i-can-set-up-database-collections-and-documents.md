@@ -1,57 +1,108 @@
-To set up database collections and documents in Appwrite, you can follow these steps:
+To set up database collections and documents in Appwrite, you can follow these steps. I'll provide examples using the Node.js and Web Appwrite SDKs.
 
-1. Create a database:
-   - Head to your [Appwrite Console](https://cloud.appwrite.io/console/) and create a new database. Give it a name, such as "Oscar", and optionally add a custom database ID.
+### Step-by-Step Guide
 
-2. Create a collection:
-   - Navigate to the **Databases** page in the Appwrite Console.
-   - Select the database you created (e.g., "Oscar").
-   - Click on **Create collection**.
-   - Give your collection a name, such as "My books", and optionally add a custom collection ID.
+1. **Create a Database:**
+   - Head to your [Appwrite Console](https://cloud.appwrite.io/console/).
+   - Create a database and name it `Oscar`. Optionally, add a custom database ID.
 
-3. Define collection attributes:
-   - In the collection settings, navigate to the **Attributes** tab.
-   - Click on **Create attribute** and select the data type for your attribute (e.g., **String**).
-   - Enter the attribute key (e.g., "title") and specify the size (e.g., "100").
-   - Repeat this step for any other attributes you want to add to your collection.
+2. **Create a Collection:**
+   - Navigate to the **Databases** page.
+   - Select the `Oscar` database.
+   - Click **Create collection** and name it `My books`. Optionally, add a custom collection ID.
 
-4. Set permissions:
-   - In the collection settings, navigate to the **Permissions** tab.
-   - Add a new role, such as **Any**, to grant public access to the collection.
-   - Check the **CREATE** and **READ** permissions for the role, so anyone can create and read documents.
+3. **Define Collection Attributes:**
+   - Navigate to **Attributes**.
+   - Click **Create attribute** and select **String**.
+   - Enter **Attribute key** (e.g., `title`) and **Size** (e.g., `100`).
 
-5. Create a document:
-   - Use the `createDocument` method in the Appwrite SDK to create a new document.
-   - Replace `<PROJECT_ID>` with your project ID (found in the project settings).
-   - Replace `<DATABASE_ID>` with the database ID (e.g., "Oscar").
-   - Replace `<COLLECTION_ID>` with the collection ID (e.g., "My books").
+4. **Set Permissions:**
+   - Navigate to **Settings** > **Permissions**.
+   - Add a new role **Any**.
+   - Check the **CREATE** and **READ** permissions, so anyone can create and read documents.
 
-Here's an example of creating a document using the Node.js SDK:
+### Code Examples
+
+#### Using Node.js SDK
+
+First, install the Appwrite Node.js SDK:
+
+```bash
+npm install node-appwrite
+```
+
+Then, use the following code to create a document:
 
 ```javascript
-const appwrite = require("appwrite");
+const { Client, Databases } = require('node-appwrite');
 
-const sdk = new appwrite.SDK();
-sdk.setEndpoint('https://[HOSTNAME_OR_IP]/v1') // Replace with your Appwrite endpoint
-sdk.setProject('PROJECT_ID') // Replace with your Appwrite project ID
-sdk.setKey('API_KEY') // Replace with your Appwrite API key
+// Initialize the client
+const client = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+    .setProject('<PROJECT_ID>') // Your project ID
+    .setKey('YOUR_API_KEY'); // Your secret API key
 
-const document = sdk.createDocument('<DATABASE_ID>', '<COLLECTION_ID>', {
-    title: 'My Book Title',
-    // Add other attributes based on your collection structure
+// Initialize the Databases service
+const databases = new Databases(client);
+
+// Create a document
+const promise = databases.createDocument('<DATABASE_ID>', '<COLLECTION_ID>', 'unique()', {
+    title: 'My First Book'
 });
 
-document.then(response => {
-    console.log(response); // The created document object
-}).catch(error => {
-    console.error(error); // Handle any errors
+promise.then(response => {
+    console.log(response); // Success
+}, error => {
+    console.log(error); // Failure
 });
 ```
 
-Please note that you need to replace the placeholders (`[HOSTNAME_OR_IP]`, `PROJECT_ID`, `API_KEY`, `<DATABASE_ID>`, `<COLLECTION_ID>`) with your actual values.
+#### Using Web SDK
+
+First, include the Appwrite Web SDK in your project. You can use a CDN or install it via npm:
+
+```bash
+npm install appwrite
+```
+
+Then, use the following code to create a document:
+
+```javascript
+import { Client, Databases } from 'appwrite';
+
+// Initialize the client
+const client = new Client();
+client
+    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+    .setProject('<PROJECT_ID>'); // Your project ID
+
+// Initialize the Databases service
+const databases = new Databases(client);
+
+// Create a document
+databases.createDocument('<DATABASE_ID>', '<COLLECTION_ID>', 'unique()', {
+    title: 'My First Book'
+})
+.then(response => {
+    console.log(response); // Success
+})
+.catch(error => {
+    console.log(error); // Failure
+});
+```
+
+### Summary
+
+1. **Create a database** in the Appwrite Console.
+2. **Create a collection** within that database.
+3. **Define attributes** for the collection.
+4. **Set permissions** for the collection.
+5. **Use the SDK** to create documents within the collection.
+
+By following these steps and using the provided code examples, you can set up database collections and documents in Appwrite.
 
 Sources:
+- https://appwrite.io/docs/tutorials/react/step-6/
 - https://appwrite.io/docs/products/databases/collections/
+- https://appwrite.io/docs/references/cloud/client-android-java/databases
 - https://appwrite.io/docs/products/databases/quick-start/
-- https://appwrite.io/docs/references/cloud/server-java/databases
-- https://appwrite.io/docs/references/cloud/client-web/databases

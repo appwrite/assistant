@@ -1,66 +1,101 @@
-To use Appwrite with React, you can follow these steps:
+To use Appwrite with React, follow these steps:
 
-1. Create a React project using Vite:
+### Prerequisites:
+1. Ensure you have a recent version of [Node.js](https://nodejs.org/en/download/) installed on your system.
+2. Have a basic knowledge of Next.js and React.
+3. Follow the [Start with React](https://appwrite.io/docs/quick-starts/react) guide.
+
+### Step-by-Step Guide:
+
+#### 1. Create a Vite Project:
+First, create a new Vite project with a React template:
 ```sh
 npm create vite@latest my-app -- --template react && cd my-app
 ```
 
-2. Install the JavaScript Appwrite SDK:
+#### 2. Install the Appwrite SDK:
+Install the JavaScript Appwrite SDK:
 ```sh
-npm install appwrite
+npm install appwrite@14.0.1
 ```
 
-3. Find your project's ID in the Appwrite Console's Settings page.
+#### 3. Setup Appwrite Project:
+1. Head to the [Appwrite Console](https://cloud.appwrite.io/console).
+2. If this is your first time using Appwrite, create an account and create your first project.
+3. Under **Add a platform**, add a **Web app**. The **Hostname** should be `localhost`.
 
-4. Create a new file `src/lib/appwrite.js` and add the following code to it, replacing `<YOUR_PROJECT_ID>` with your project ID:
-```js
-import { Client, Account } from 'appwrite';
+#### 4. Initialize Appwrite SDK:
+Create a new file `src/lib/appwrite.js` to hold your Appwrite-related code. Only one instance of the `Client()` class should be created per app. Add the following code to it, replacing `<YOUR_PROJECT_ID>` with your project ID:
 
-export const client = new Client();
+```javascript
+import { Client, Databases, Account } from "appwrite";
 
+const client = new Client();
 client
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('<YOUR_PROJECT_ID>');
+  .setEndpoint("https://cloud.appwrite.io/v1")
+  .setProject("<YOUR_PROJECT_ID>"); // Replace with your project ID
 
 export const account = new Account(client);
+export const databases = new Databases(client);
 ```
 
-5. In your React component, import the `account` object from the `appwrite.js` file and use it to implement authentication or other Appwrite features. Here's an example of a login form:
-```js
+#### 5. Create a Simple Login Form:
+Add the following components to your `App.js` file to create a simple login form:
+
+```javascript
 import React, { useState } from 'react';
 import { account } from './lib/appwrite';
 
-const LoginForm = () => {
+function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
-  async function handleLogin() {
+  const login = async (email, password) => {
     try {
-      await account.createEmailSession(email, password);
-      console.log('Logged in successfully');
+      const response = await account.createSession(email, password);
+      setLoggedInUser(response);
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error(error);
     }
-  }
+  };
 
   return (
     <div>
-      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button onClick={handleLogin}>Login</button>
+      <h1>{loggedInUser ? `Logged in as ${loggedInUser.name}` : 'Not logged in'}</h1>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <button onClick={() => login(email, password)}>Login</button>
     </div>
   );
 }
 
-export default LoginForm;
+export default App;
 ```
 
-Remember to replace `<YOUR_PROJECT_ID>` with your actual project ID. This example demonstrates a basic login form using the `createEmailSession` method from the `account` object.
-
-Please note that this answer is based on the provided context and may not cover all possible scenarios or variations in using Appwrite with React. For more detailed information and additional features, please refer to the official Appwrite documentation and reference pages.
+### Summary:
+By following these steps, you can set up Appwrite with React and create a simple login form. This example demonstrates how to initialize the Appwrite SDK and use it to handle user authentication. For more advanced features, refer to the [Appwrite documentation](https://appwrite.io/docs).
 
 Sources:
+- https://appwrite.io/docs/tutorials/nextjs-ssr-auth/step-1/
+- https://appwrite.io/docs/tutorials/nextjs-ssr-auth/step-2/
 - https://appwrite.io/docs/quick-starts/react/
-- https://appwrite.io/docs/tutorials/sveltekit-auth/step-1/
-- https://appwrite.io/docs/quick-starts/nextjs/
-- https://appwrite.io/docs/tutorials/refine/step-5/
+- https://appwrite.io/docs/tutorials/react/step-3/
+- https://appwrite.io/docs/quick-starts/react-native/
