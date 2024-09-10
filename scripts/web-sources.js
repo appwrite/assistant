@@ -27,6 +27,7 @@ const SDKS = [
   "client-graphql",
   "client-rest",
   "server-dart",
+  "server-go",
   "server-deno",
   "server-dotnet",
   "server-nodejs",
