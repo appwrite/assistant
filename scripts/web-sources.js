@@ -76,7 +76,7 @@ for (const sdk of SDKS) {
 
     // Ignore the header and footer
     const matches = html.match(
-      /<main class="u-contents" id="main">(.*?)<\/main>/s
+      /<main class="contents" id="main">(.*?)<\/main>/s
     );
     if (!matches || !matches[0]) {
       console.warn(`Skipping page ${url} - no <main> tag found`);
