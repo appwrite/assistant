@@ -1,7 +1,8 @@
 import "dotenv/config";
+
 import { mkdir, writeFile } from "fs/promises";
 import { execa } from "execa";
-import { NodeHtmlMarkdown } from "node-html-markdown";
+import { convert } from "html-to-text";
 
 const WEBSITE_URL = process.env._BUILD_WEBSITE_URL ?? "https://appwrite.io";
 if (!WEBSITE_URL) {
@@ -83,9 +84,11 @@ for (const sdk of SDKS) {
       continue;
     }
 
-    const markdown = NodeHtmlMarkdown.translate(matches[0]);
+    const text = convert(matches[0], {
+      wordwrap: false,
+    });
 
-    await writeFile(`./sources/references/${sdk}/${service}.md`, markdown);
+    await writeFile(`./sources/references/${sdk}/${service}.md`, text);
     console.log(`Created ./sources/references/${sdk}/${service}.md`);
   }
 }
