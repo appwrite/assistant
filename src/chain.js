@@ -1,6 +1,5 @@
 import { RunnableSequence } from "@langchain/core/runnables";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { StringOutputParser } from "@langchain/core/output_parsers";
+import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
 import { getRetriever } from "./retriever.js";
 import { formatDocumentsAsString } from "langchain/util/document";
@@ -26,16 +25,11 @@ export const getChain = async () => {
 
             return { messages, systemPrompt, context };
         },
-
-        async ({ messages, systemPrompt, context }) => {
-            const messagesWithContext = [
-                { role: 'system', content: systemPrompt },
-                ...messages,
-                { role: 'assistant', content: 'Context: ' + context }
-            ];
-            return ChatPromptTemplate.fromMessages(messagesWithContext)
-        },
-
+        ChatPromptTemplate.fromMessages([
+            { role: 'system', content: '{systemPrompt}' },
+            new MessagesPlaceholder('messages'),
+            { role: 'assistant', content: 'Context: {context}' },
+        ]),
         // Run the ChatPromptTemplate through the model
         new ChatOpenAI({
             model: process.env._APP_ASSISTANT_OPENAI_MODEL || 'gpt-4',

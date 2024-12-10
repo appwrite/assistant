@@ -1,3 +1,3 @@
-import { getRetriever } from "../src/retriever";
+import { getRetriever } from "../src/retriever.js";
 
 await getRetriever();
