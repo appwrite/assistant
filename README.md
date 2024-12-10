@@ -16,7 +16,7 @@ To install, run the following command.
 pnpm i
 ```
 
-Next, fetch the Appwrite-specific sources used by the assistant. This will download the sources from the Appwrite documentation and store them in the `./sources` directory.
+Next, fetch the Appwrite-specific sources used by the assistant. This will download the sources from the Appwrite documentation and store them in the `./index` directory.
 
 ```bash
 pnpm run index

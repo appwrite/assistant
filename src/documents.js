@@ -5,9 +5,9 @@ import { MarkdownTextSplitter } from "langchain/text_splitter";
 
 const getDocumentation = async () => {
   const filenames = await glob([
-    "./sources/website/src/routes/docs/**/*.markdoc",
-    "./sources/website/src/routes/docs/**/*.md",
-    "./sources/website/src/partials/**/*.md",
+    "./index/website/src/routes/docs/**/*.markdoc",
+    "./index/website/src/routes/docs/**/*.md",
+    "./index/website/src/partials/**/*.md",
   ]);
 
   return Promise.all(
@@ -15,10 +15,10 @@ const getDocumentation = async () => {
       const contents = await readFile(filename, { encoding: "utf8" });
 
       const url =
-        filename.startsWith("sources/website/src/routes/") &&
+        filename.startsWith("index/website/src/routes/") &&
           filename.endsWith("+page.markdoc")
           ? `https://appwrite.io/${filename
-            .replace("sources/website/src/routes/", "")
+            .replace("index/website/src/routes/", "")
             .replace("+page.markdoc", "")}`
           : undefined;
 
@@ -37,7 +37,7 @@ const getDocumentation = async () => {
 };
 
 const getReferences = async () => {
-  const filenames = await glob(["./sources/references/**/*.md"]);
+  const filenames = await glob(["./index/references/**/*.md"]);
 
   return Promise.all(
     filenames.map(async (filename) => {
@@ -89,7 +89,7 @@ function parseMarkdownFrontmatter(contents) {
 
 function parseReferenceData(filename) {
   const [sdk, service] = filename
-    .replace("sources/references/", "")
+    .replace("index/references/", "")
     .replace(".md", "")
     .split("/");
   return { sdk, service };

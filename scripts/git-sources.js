@@ -16,7 +16,7 @@ if (!GIT_BRANCH) {
   );
 }
 
-const LOCAL_PATH = "./sources/website";
+const LOCAL_PATH = "./index/website";
 const FILES = [
   "src/routes/docs/**/*.markdoc",
   "src/routes/docs/**/*.md",

@@ -18,7 +18,7 @@ if (!WEBSITE_VERSION) {
   );
 }
 
-const LOCAL_PATH = "./sources/references";
+const LOCAL_PATH = "./index/references";
 const SDKS = [
   "client-web",
   "client-flutter",
@@ -59,7 +59,7 @@ await mkdir(LOCAL_PATH, { recursive: true });
 console.log("Downloading reference pages...");
 
 for (const sdk of SDKS) {
-  await mkdir(`./sources/references/${sdk}/`, { recursive: true });
+  await mkdir(`./index/references/${sdk}/`, { recursive: true });
 
   for (const service of SERVICES) {
     const url = new URL(
@@ -88,7 +88,7 @@ for (const sdk of SDKS) {
       wordwrap: false,
     });
 
-    await writeFile(`./sources/references/${sdk}/${service}.md`, text);
-    console.log(`Created ./sources/references/${sdk}/${service}.md`);
+    await writeFile(`./index/references/${sdk}/${service}.md`, text);
+    console.log(`Created ./index/references/${sdk}/${service}.md`);
   }
 }

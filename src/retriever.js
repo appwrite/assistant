@@ -17,7 +17,7 @@ export const getRetriever = async () => {
     batchSize: 2048,
   });
 
-  const storeDir = "sources/vector";
+  const storeDir = "index/vector";
   const indexFilePath = path.join(storeDir, "hnswlib.index");
 
   let vectorStore;
