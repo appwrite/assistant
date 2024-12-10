@@ -16,11 +16,11 @@ const getDocumentation = async () => {
 
       const url =
         filename.startsWith("sources/website/src/routes/") &&
-        filename.endsWith("+page.markdoc")
+          filename.endsWith("+page.markdoc")
           ? `https://appwrite.io/${filename
-              .replace("sources/website/src/routes/", "")
-              .replace("+page.markdoc", "")}`
-          : null;
+            .replace("sources/website/src/routes/", "")
+            .replace("+page.markdoc", "")}`
+          : undefined;
 
       const metadata = {
         filename,
@@ -57,14 +57,7 @@ const getReferences = async () => {
   );
 };
 
-export const getDocuments = async () => {
-  const documentation = await getDocumentation();
-  const references = await getReferences();
-
-  return await splitDocuments([...documentation, ...references]);
-};
-
-/**x
+/**
  * @param {Document[]} documents
  * @returns {Promise<Document<Record<string, any>>[]>}
  */
@@ -106,9 +99,9 @@ function parseReferenceData(filename) {
  * Clean up markdoc contents to make them more suitable for search.
  *
  * @param {string} contents
- * @param {string|null} currentUrl
+ * @param {string | undefined} currentUrl
  */
-function cleanMarkdoc(contents, currentUrl = null) {
+function cleanMarkdoc(contents, currentUrl) {
   return (
     contents
       // Remove the frontmatter
@@ -137,3 +130,10 @@ function cleanMarkdoc(contents, currentUrl = null) {
       })
   );
 }
+
+export const getDocuments = async () => {
+  const documentation = await getDocumentation();
+  const references = await getReferences();
+
+  return await splitDocuments([...documentation, ...references]);
+};
