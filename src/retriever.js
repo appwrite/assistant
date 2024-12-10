@@ -41,7 +41,7 @@ export const getRetriever = async () => {
     await vectorStore.save(storeDir);
   }
 
-  retriever = vectorStore.asRetriever(5);
+  retriever = vectorStore.asRetriever(8);
 
   return retriever;
 };

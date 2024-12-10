@@ -1,47 +1,60 @@
-Based on the provided context, the only endpoint mentioned for the Avatars API is:
+The Avatars API in the Appwrite PHP SDK provides several endpoints to help you manage and generate avatars. Here are the available endpoints:
 
-```text
-GET /avatars/image
-```
+1. **GET /avatars/qr**: Generates a QR code image.
+   - Example in PHP:
+     ```php
+     use Appwrite\Client;
+     use Appwrite\Services\Avatars;
 
-However, this context does not provide a comprehensive list of all available endpoints for the Avatars API. For a complete list of endpoints and their functionalities, I recommend referring to the official Appwrite documentation.
+     $client = (new Client())
+         ->setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+         ->setProject('<YOUR_PROJECT_ID>') // Your project ID
+         ->setSession(''); // The user session to authenticate with
 
-If you need to use the Avatars API with the PHP SDK, here is an example of how you might use the `GET /avatars/image` endpoint:
+     $avatars = new Avatars($client);
+     ```
 
-### PHP SDK Example
+2. **GET /avatars/image**: Fetches an image avatar.
+   - Example in PHP:
+     ```php
+     use Appwrite\Client;
+     use Appwrite\Services\Avatars;
 
-```php
-<?php
+     $client = (new Client())
+         ->setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+         ->setProject('<YOUR_PROJECT_ID>') // Your project ID
+         ->setSession(''); // The user session to authenticate with
 
-require_once 'vendor/autoload.php';
+     $avatars = new Avatars($client);
+     ```
 
-use Appwrite\Client;
-use Appwrite\Services\Avatars;
+3. **GET /avatars/initials**: Generates an avatar with initials.
+   - Example in PHP:
+     ```php
+     use Appwrite\Client;
+     use Appwrite\Services\Avatars;
 
-$client = new Client();
+     $client = (new Client())
+         ->setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+         ->setProject('<YOUR_PROJECT_ID>') // Your project ID
+         ->setSession(''); // The user session to authenticate with
 
-$client
-    ->setEndpoint('https://[HOSTNAME_OR_IP]/v1') // Your API Endpoint
-    ->setProject('YOUR_PROJECT_ID') // Your project ID
-    ->setKey('YOUR_API_KEY'); // Your secret API key
+     $avatars = new Avatars($client);
+     ```
 
-$avatars = new Avatars($client);
+4. **GET /avatars/browsers/{code}**: Fetches a browser icon by code.
+   - Example in PHP:
+     ```php
+     use Appwrite\Client;
+     use Appwrite\Services\Avatars;
+     use Appwrite\Enums\Browser;
 
-try {
-    $response = $avatars->getImage('https://example.com/image.png');
-    echo $response; // Handle the response as needed
-} catch (Exception $e) {
-    echo 'Error: ' . $e->getMessage();
-}
-```
+     $client = (new Client())
+         ->setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+         ->setProject('<YOUR_PROJECT_ID>') // Your project ID
+         ->setSession(''); // The user session to authenticate with
 
-Make sure to replace `'YOUR_PROJECT_ID'`, `'YOUR_API_KEY'`, and the URL in `getImage` with your actual project ID, API key, and image URL respectively.
+     $avatars = new Avatars($client);
+     ```
 
-For more detailed information and additional endpoints, please refer to the [Appwrite Avatars API documentation](https://appwrite.io/docs/client/avatars).
-
-Sources:
-- https://appwrite.io/docs/references/cloud/server-nodejs/avatars
-- https://appwrite.io/docs/references/cloud/client-rest/avatars
-- https://appwrite.io/docs/references/cloud/client-graphql/avatars
-- https://appwrite.io/docs/references/cloud/server-dart/avatars
-- https://appwrite.io/docs/references/cloud/client-apple/avatars
+These endpoints allow you to generate and retrieve different types of avatars using the Appwrite PHP SDK. Make sure to replace placeholders like `<YOUR_PROJECT_ID>` with your actual project details.

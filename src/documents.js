@@ -63,8 +63,8 @@ const getReferences = async () => {
  */
 async function splitDocuments(documents) {
   const splitter = new MarkdownTextSplitter({
-    chunkSize: 1024,
-    chunkOverlap: 64,
+    chunkSize: 512,
+    chunkOverlap: 256,
   });
 
   const texts = documents.map((document) => document.pageContent);

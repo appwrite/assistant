@@ -9,9 +9,6 @@ export const getChain = async () => {
     const retriever = await getRetriever();
 
     return RunnableSequence.from([
-        // First step: Run retrieval on the last user message only.
-        // We expect the input to include `messages`: an array of objects 
-        // [{role: 'user'|'assistant'|'system', content: string}, ...]
         async ({ messages, systemPrompt }) => {
             // Extract the last user message
             const lastUserMessage = messages.reverse().find(m => m.role === 'user');
