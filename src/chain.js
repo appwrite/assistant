@@ -11,9 +11,6 @@ export const getChain = async () => {
     return RunnableSequence.from([
         // First step: extract userPrompt and systemPrompt, run the retrieval, and format the context.
         async ({ userPrompt, systemPrompt }) => {
-            if (typeof userPrompt !== "string") {
-                throw new Error("userPrompt must be a string.");
-            }
             const docs = await retriever.invoke(userPrompt);
             const context = await formatDocumentsAsString(docs);
             return { userPrompt, systemPrompt, context };
@@ -28,10 +25,10 @@ export const getChain = async () => {
 
         // The model will receive the processed template as input
         new ChatOpenAI({
-            model: "gpt-4o",
+            model: process.env._APP_ASSISTANT_OPENAI_MODEL || 'gpt-4o',
             openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-            temperature: 0.1,
-            maxTokens: 1000,
+            temperature: Number(process.env._APP_ASSISTANT_TEMPERATURE || '0.1'),
+            maxTokens: Number(process.env._APP_ASSISTANT_MAX_TOKENS || '1000'),
         }),
 
         // Finally, parse the output string
