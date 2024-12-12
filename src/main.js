@@ -25,17 +25,17 @@ app.post("/", async (req, res) => {
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
 
-  const { prompt: userPrompt } = JSON.parse(text);
+  const { prompt: userPrompt, systemPrompt } = JSON.parse(text);
   if (!userPrompt || typeof userPrompt !== "string") {
     res.status(400).send("Missing 'prompt' in request body.");
     return;
   }
 
-  const systemPrompt = req.headers["x-assistant-system-prompt"] ?? DEFAULT_SYSTEM_PROMPT;
+  const systemPrompt = req.headers["x-assistant-system-prompt"] ;
 
   const stream = await chain.stream({
     messages: [{ role: "user", content: userPrompt }],
-    systemPrompt,
+    systemPrompt ?? DEFAULT_SYSTEM_PROMPT
   });
 
   for await (const chunk of stream) {
