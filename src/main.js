@@ -20,21 +20,20 @@ let retriever = null;
 
 const port = 3003;
 
-const template = (
-  prompt
-) => `You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.
-${prompt}`;
+const DEFAULT_SYSTEM_PROMPT = "You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.";
 
 app.post("/", async (req, res) => {
   if (!retriever) {
     res.status(500).send("Search index not initialized");
     return;
   }
+
   // raw to text
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
-  const { prompt } = JSON.parse(text);
-  const templated = template(prompt);
+
+  let { prompt, systemPrompt } = JSON.parse(text);
+  const templated = `${systemPrompt ?? DEFAULT_SYSTEM_PROMPT}\n\n${prompt}`
 
   const relevantDocuments = await retriever.getRelevantDocuments(prompt);
 
