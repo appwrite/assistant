@@ -28,14 +28,12 @@ app.post("/", async (req, res) => {
     return;
   }
 
-  const systemPrompt = req.headers["x-assistant-system-prompt"] ?? DEFAULT_SYSTEM_PROMPT;
-  const template = (prompt) => `${systemPrompt}\n\n${prompt}`;
-
   // raw to text
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
-  const { prompt } = JSON.parse(text);
-  const templated = template(prompt);
+
+  let { prompt, systemPrompt } = JSON.parse(text);
+  const templated = `${systemPrompt ?? DEFAULT_SYSTEM_PROMPT}\n\n${prompt}`
 
   const relevantDocuments = await retriever.getRelevantDocuments(prompt);
 
