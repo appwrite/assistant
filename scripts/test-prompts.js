@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from "fs/promises";
 
-const SERVER_URL = "http://localhost:3003/";
+const SERVER_URL = "http://localhost:3003/v1/models/assistant/prompt";
 const PROMPTS = [
   "How do you add a custom domain in the console?",
   "Show me how I can set up database collections and documents.",
