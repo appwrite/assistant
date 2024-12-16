@@ -41,7 +41,7 @@ The server exposes a POST endpoint at `/`. The endpoint expects a raw text body 
 Use cURL to test the server, for example:
 
 ```bash
-curl -X POST -d "How do I create a user?" http://localhost:3000
+curl -X POST -H "Content-Type: application/json" -d "{\"prompt\": \"How do I create a new user?\"}" http://localhost:3000/v1/models/assistant/prompt
 ```
 
 ## Contributing
