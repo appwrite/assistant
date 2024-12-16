@@ -62,6 +62,10 @@ app.post("/", async (req, res) => {
   res.end();
 });
 
+app.get("/v1/health", (_, res) => {
+  res.send("OK");
+});
+
 app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
   console.log("Initializing search index...");
