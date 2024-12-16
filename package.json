@@ -1,5 +1,5 @@
 {
-  "name": "ai-api",
+  "name": "appwrite-assistant",
   "version": "0.1.0",
   "description": "",
   "main": "main.js",
@@ -7,23 +7,29 @@
     "start": "node src/main.js",
     "test": "node scripts/test-prompts.js",
     "dev": "nodemon src/main.js",
-    "fetch-sources": "node scripts/git-sources.js && node scripts/web-sources.js"
+    "index": "node scripts/git-sources.js && node scripts/web-sources.js && node scripts/vector-store.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
+    "@langchain/community": "^0.3.17",
+    "@langchain/core": "^0.3.22",
+    "@langchain/openai": "^0.3.14",
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "execa": "^8.0.1",
-    "express": "^4.18.2",
-    "glob": "^10.3.10",
-    "hnswlib-node": "^1.4.2",
-    "langchain": "^0.0.199",
-    "node-html-markdown": "^1.3.0",
-    "nodemon": "^3.0.1",
-    "peggy": "^3.0.2"
+    "dotenv": "^16.4.7",
+    "execa": "^9.5.2",
+    "express": "^4.21.2",
+    "glob": "^11.0.0",
+    "hnswlib-node": "^3.0.0",
+    "html-to-text": "^9.0.5",
+    "langchain": "^0.3.6",
+    "nodemon": "^3.1.7"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/express": "^5.0.0"
   },
   "type": "module"
 }

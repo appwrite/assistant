@@ -2,10 +2,14 @@ import "dotenv/config";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-import {
-  getChain,
-  intializeDocumentRetriever as initializeRetriever,
-} from "./embeddings.js";
+import { getChain } from "./chain.js";
+
+const DEFAULT_SYSTEM_PROMPT = `
+- You are an AI chatbot called Appwrite Assistant, with information from Appwrite documentation and references.
+- Help developers answer Appwrite-related questions only. 
+- Use the context to formulate your answers, only refer to SDK methods and API endpoints directly from the context, do not guess.
+- By default, orovide code examples in Node and Web Appwrite SDKs.
+`;
 
 const app = express();
 app.use(
@@ -15,48 +19,66 @@ app.use(
 );
 app.use(bodyParser.raw({ inflate: true, type: "*/*" }));
 
-/** @type {import("langchain/schema/retriever").BaseRetriever?} */
-let retriever = null;
-
-const port = 3003;
-
-const DEFAULT_SYSTEM_PROMPT = "You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.";
+const chain = await getChain();
 
 app.post("/", async (req, res) => {
-  if (!retriever) {
-    res.status(500).send("Search index not initialized");
-    return;
-  }
-
-  // raw to text
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
 
-  let { prompt, systemPrompt } = JSON.parse(text);
-  const templated = `${systemPrompt ?? DEFAULT_SYSTEM_PROMPT}\n\n${prompt}`
+  const { prompt: userPrompt, systemPrompt } = JSON.parse(text);
+  if (!userPrompt || typeof userPrompt !== "string") {
+    res.status(400).send("Missing 'prompt' in request body.");
+    return;
+  }
 
-  const relevantDocuments = await retriever.getRelevantDocuments(prompt);
+  const systemPrompt = req.headers["x-assistant-system-prompt"] ;
 
-  const chain = await getChain((token) => {
-    res.write(token);
+  const stream = await chain.stream({
+    messages: [{ role: "user", content: userPrompt }],
+    systemPrompt ?? DEFAULT_SYSTEM_PROMPT
   });
 
-  await chain.call({
-    input_documents: relevantDocuments,
-    question: templated,
-  });
+  for await (const chunk of stream) {
+    res.write(chunk.content)
+  }
 
-  const sources = new Set(
-    relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url)
+  res.end();
+});
+
+app.post("/v1/chat", async (req, res) => {
+  const decoder = new TextDecoder();
+  const text = decoder.decode(req.body);
+
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    res.status(400).send("Invalid JSON in request body.");
+    return;
+  }
+
+  let { messages } = parsed;
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    res.status(400).send("Missing or invalid 'messages' in request body.");
+    return;
+  }
+
+  // Filter out any user-provided system messages
+  // Only allow 'user' and 'assistant' roles from the user’s request.
+  // The server injects its own system prompt in the chain
+  messages = messages.filter(
+    (m) => m.role === "user" || m.role === "assistant"
   );
 
-  if (sources.size > 0) {
-    res.write("\n\nSources:\n");
-    for (const sourceUrl of new Set(
-      relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url)
-    )) {
-      res.write("- " + sourceUrl + "\n");
-    }
+  const systemPrompt = req.headers["x-assistant-system-prompt"] ?? DEFAULT_SYSTEM_PROMPT;
+
+  const stream = await chain.stream({
+    messages,
+    systemPrompt,
+  });
+
+  for await (const chunk of stream) {
+    res.write(chunk.content);
   }
 
   res.end();
@@ -66,13 +88,8 @@ app.get("/v1/health", (_, res) => {
   res.send("OK");
 });
 
+const port = 3003;
+
 app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
-  console.log("Initializing search index...");
-  try {
-    retriever = await initializeRetriever();
-    console.log("Search index initialized");
-  } catch (e) {
-    console.error(e);
-  }
 });

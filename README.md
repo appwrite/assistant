@@ -16,10 +16,10 @@ To install, run the following command.
 pnpm i
 ```
 
-Next, fetch the Appwrite-specific sources used by the assistant. This will download the sources from the Appwrite documentation and store them in the `./sources` directory.
+Next, fetch the Appwrite-specific sources used by the assistant. This will download the sources from the Appwrite documentation and store them in the `./index` directory.
 
 ```bash
-pnpm run fetch-sources
+pnpm run index
 ```
 
 The scripts will pull the latest documentation from the `main` branch of the [website repository](https://github.com/appwrite/website), and the latest API reference from live [Appwrite documentation](https://appwrite.io/docs). 
