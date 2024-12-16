@@ -89,6 +89,7 @@ app.get("/v1/health", (_, res) => {
 });
 
 const port = 3003;
+
 app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
 });
