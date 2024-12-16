@@ -15,19 +15,22 @@ export const intializeDocumentRetriever = async () => {
   return vectorStore.asRetriever(5);
 };
 
-export const getChain = async (onToken) => {
+export const getOpenAIChat = async (onToken) =>
+  new OpenAIChat({
+    modelName: "gpt-4o",
+    openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
+    temperature: 0.3,
+    maxTokens: 1000,
+    streaming: true,
+    callbacks: [
+      {
+        handleLLMNewToken: onToken,
+      },
+    ],
+  });
+
+export const getRagChain = async (onToken) => {
   return loadQAStuffChain(
-    new OpenAIChat({
-      modelName: "gpt-4o",
-      openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-      temperature: 0.3,
-      maxTokens: 1000,
-      streaming: true,
-      callbacks: [
-        {
-          handleLLMNewToken: onToken,
-        },
-      ],
-    })
+    (await getOpenAIChat(onToken)),
   );
 };
