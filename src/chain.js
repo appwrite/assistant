@@ -10,14 +10,10 @@ export const getChain = async () => {
 
     return RunnableSequence.from([
         async ({ messages, systemPrompt }) => {
-            // Extract the last user message
-            const lastUserMessage = messages.reverse().find(m => m.role === 'user');
-            if (!lastUserMessage) {
-                throw new Error("No user message found in messages array.");
-            }
+            const question = messages.reverse().find(m => m.role === 'user');
+            if (!question) throw new Error("No user message found in messages array.");
 
-            // Run retrieval on the last user message
-            const docs = await retriever.invoke(lastUserMessage.content);
+            const docs = await retriever.invoke(question.content);
             const context = await formatDocumentsAsString(docs);
 
             return { messages, systemPrompt, context };
@@ -27,7 +23,6 @@ export const getChain = async () => {
             new MessagesPlaceholder('messages'),
             { role: 'assistant', content: 'Context: {context}' },
         ]),
-        // Run the ChatPromptTemplate through the model
         new ChatOpenAI({
             model: process.env._APP_ASSISTANT_OPENAI_MODEL || 'gpt-4',
             openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,

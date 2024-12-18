@@ -1,4 +1,5 @@
 import "dotenv/config";
+
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
@@ -21,7 +22,7 @@ app.use(bodyParser.raw({ inflate: true, type: "*/*" }));
 
 const chain = await getChain();
 
-app.post("/", async (req, res) => {
+app.post("/v1/models/assistant/prompt", async (req, res) => {
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
 
@@ -31,12 +32,17 @@ app.post("/", async (req, res) => {
     return;
   }
 
-  const systemPrompt = req.headers["x-assistant-system-prompt"] ;
+  if (!!systemPrompt && typeof systemPrompt !== "string") {
+    res.status(400).send("Invalid 'systemPrompt' in request body.");
+    return;
+  }
 
   const stream = await chain.stream({
     messages: [{ role: "user", content: userPrompt }],
-    systemPrompt ?? DEFAULT_SYSTEM_PROMPT
+    systemPrompt: systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
   });
+
+  res.setHeader("Content-Type", "text/event-stream");
 
   for await (const chunk of stream) {
     res.write(chunk.content)
@@ -45,37 +51,34 @@ app.post("/", async (req, res) => {
   res.end();
 });
 
-app.post("/v1/chat", async (req, res) => {
+app.post("/v1/models/assistant/chat", async (req, res) => {
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
 
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch (error) {
-    res.status(400).send("Invalid JSON in request body.");
+  const { messages, systemPrompt } = JSON.parse(text);
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    res.status(400).send("Missing or invalid 'messages' in request body.");
     return;
   }
 
-  let { messages } = parsed;
-  if (!messages || !Array.isArray(messages) || messages.length === 0) {
-    res.status(400).send("Missing or invalid 'messages' in request body.");
+  if (!!systemPrompt && typeof systemPrompt !== "string") {
+    res.status(400).send("Invalid 'systemPrompt' in request body.");
     return;
   }
 
   // Filter out any user-provided system messages
   // Only allow 'user' and 'assistant' roles from the user’s request.
   // The server injects its own system prompt in the chain
-  messages = messages.filter(
+  const filteredMessage = messages.filter(
     (m) => m.role === "user" || m.role === "assistant"
   );
 
-  const systemPrompt = req.headers["x-assistant-system-prompt"] ?? DEFAULT_SYSTEM_PROMPT;
-
   const stream = await chain.stream({
-    messages,
-    systemPrompt,
+    messages: filteredMessage,
+    systemPrompt: systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
   });
+
+  res.setHeader("Content-Type", "text/event-stream");
 
   for await (const chunk of stream) {
     res.write(chunk.content);
