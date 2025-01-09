@@ -2,10 +2,21 @@ version: '3.8'
 
 services:
   assistant:
+    hostname: assistant
     build: .
     ports:
       - 3003:3003
+    networks:
+      - appwrite
     volumes:
       - ./docs:/app/docs
     environment:
       - _APP_ASSISTANT_OPENAI_API_KEY
+      - _BUILD_GIT_URL
+      - _BUILD_GIT_BRANCH
+      - _BUILD_WEBSITE_URL
+      - _BUILD_WEBSITE_VERSION
+
+networks:
+  appwrite:
+    external: true

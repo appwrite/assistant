@@ -62,6 +62,30 @@ app.post("/", async (req, res) => {
   res.end();
 });
 
+app.post("/generic", async (req, res) => {
+  // raw to text
+  const decoder = new TextDecoder();
+  const text = decoder.decode(req.body);
+
+  let { prompt, systemPrompt } = JSON.parse(text);
+  const templated = `${systemPrompt ?? DEFAULT_SYSTEM_PROMPT}\n\n${prompt}`
+
+  const chain = await getChain((token) => {
+    res.write(token);
+  });
+
+  await chain.call({
+    input_documents: [], // Pass empty array since we don't need document retrieval
+    question: templated,
+  });
+
+  res.end();
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
 app.listen(port, async () => {
   console.log(`Started server on port: ${port}`);
   console.log("Initializing search index...");

@@ -2,6 +2,8 @@ import "dotenv/config";
 import { mkdir, writeFile } from "fs/promises";
 import { execa } from "execa";
 
+console.log(process.env)
+
 const GIT_URL =
   process.env._BUILD_GIT_URL ?? "https://github.com/appwrite/website.git";
 if (!GIT_URL) {
