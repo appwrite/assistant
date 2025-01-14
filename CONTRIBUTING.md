@@ -57,6 +57,15 @@ docker compose build \
 docker compose up
 ```
 
+### 6. Linting and Formatting
+
+We use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/) to lint and format our code.
+
+```bash
+pnpm format
+pnpm lint
+```
+
 ## Submit a Pull Request 🚀
 
 The branch naming convention is as follows
