@@ -6,14 +6,14 @@ import { NodeHtmlMarkdown } from "node-html-markdown";
 const WEBSITE_URL = process.env._BUILD_WEBSITE_URL ?? "https://appwrite.io";
 if (!WEBSITE_URL) {
   console.warn(
-    `No environment variable _BUILD_WEBSITE_URL - using ${WEBSITE_URL}`
+    `No environment variable _BUILD_WEBSITE_URL - using ${WEBSITE_URL}`,
   );
 }
 
 const WEBSITE_VERSION = process.env._BUILD_WEBSITE_VERSION ?? "cloud";
 if (!WEBSITE_VERSION) {
   console.warn(
-    `No environment variable _BUILD_WEBSITE_VERSION - using ${WEBSITE_VERSION}`
+    `No environment variable _BUILD_WEBSITE_VERSION - using ${WEBSITE_VERSION}`,
   );
 }
 
@@ -63,7 +63,7 @@ for (const sdk of SDKS) {
   for (const service of SERVICES) {
     const url = new URL(
       `/docs/references/${WEBSITE_VERSION}/${sdk}/${service}`,
-      WEBSITE_URL
+      WEBSITE_URL,
     );
 
     const response = await fetch(url.toString());
@@ -76,7 +76,7 @@ for (const sdk of SDKS) {
 
     // Ignore the header and footer
     const matches = html.match(
-      /<main class="contents" id="main">(.*?)<\/main>/s
+      /<main class="contents" id="main">(.*?)<\/main>/s,
     );
     if (!matches || !matches[0]) {
       console.warn(`Skipping page ${url} - no <main> tag found`);

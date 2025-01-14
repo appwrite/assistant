@@ -32,7 +32,7 @@ const getDocumentation = async () => {
         metadata,
         pageContent: cleanMarkdoc(contents, metadata.url),
       });
-    })
+    }),
   );
 };
 
@@ -53,7 +53,7 @@ const getReferences = async () => {
         metadata,
         pageContent: cleanMarkdoc(contents, metadata.url),
       });
-    })
+    }),
   );
 };
 
@@ -122,16 +122,16 @@ function cleanMarkdoc(contents, currentUrl = null) {
       .replace(/{% [\s\S]*? %}/g, "")
       // Remove links to images
       // e.g. ![image](./image.png)
-      .replace(/!\[[^\]]*\]\((?!http)([^\)]*)\)/g, "")
+      .replace(/!\[[^\]]*\]\((?!http)([^)]*)\)/g, "")
       // Replace relative heading links with absolute links
       // e.g. [Getting Started](#getting-started) -> [Getting Started](https://appwrite.io/docs/current-page#getting-started)
-      .replace(/\[([^\]]*)\]\((?!http)([^\)]*)\)/g, (_, p1, p2) => {
+      .replace(/\[([^\]]*)\]\((?!http)([^)]*)\)/g, (_, p1, p2) => {
         if (!currentUrl) return "";
         return `[${p1}](${currentUrl}#${p2})`;
       })
       // Replace relative links with absolute links
       // e.g. [Databases](/docs/products/databases) -> [Databases][(https://appwrite.io/docs/products/databases)
-      .replace(/\[([^\]]*)\]\((?!http)([^\)]*)\)/g, (_, p1, p2) => {
+      .replace(/\[([^\]]*)\]\((?!http)([^)]*)\)/g, (_, p1, p2) => {
         if (!currentUrl) return "";
         return `[${p1}](${new URL(currentUrl).origin}/${p2})`;
       })

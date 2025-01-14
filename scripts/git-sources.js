@@ -11,7 +11,7 @@ if (!GIT_URL) {
 const GIT_BRANCH = process.env._BUILD_GIT_BRANCH ?? "main";
 if (!GIT_BRANCH) {
   console.warn(
-    `No environment variable _BUILD_GIT_BRANCH - using ${GIT_BRANCH}`
+    `No environment variable _BUILD_GIT_BRANCH - using ${GIT_BRANCH}`,
   );
 }
 
@@ -30,7 +30,7 @@ await execa(
   ["clone", "--no-checkout", "--depth", "1", GIT_URL, LOCAL_PATH],
   {
     stdio: "inherit",
-  }
+  },
 );
 
 await mkdir(`${LOCAL_PATH}/.git/info`, { recursive: true });

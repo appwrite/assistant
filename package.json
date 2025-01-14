@@ -7,6 +7,8 @@
     "start": "node src/main.js",
     "test": "node scripts/test-prompts.js",
     "dev": "nodemon src/main.js",
+    "lint": "eslint src",
+    "format": "prettier --write \"src/**/*.js\" \"scripts/**/*.js\"",
     "fetch-sources": "node scripts/git-sources.js && node scripts/web-sources.js"
   },
   "keywords": [],
@@ -25,5 +27,11 @@
     "nodemon": "^3.0.1",
     "peggy": "^3.0.2"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2"
+  }
 }

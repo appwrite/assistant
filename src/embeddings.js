@@ -30,7 +30,5 @@ export const getOpenAIChat = async (onToken) =>
   });
 
 export const getRagChain = async (onToken) => {
-  return loadQAStuffChain(
-    (await getOpenAIChat(onToken)),
-  );
+  return loadQAStuffChain(await getOpenAIChat(onToken));
 };
