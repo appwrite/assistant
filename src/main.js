@@ -6,14 +6,13 @@ import {
   getRagChain,
   getOpenAIChat,
   intializeDocumentRetriever as initializeRetriever,
-
 } from "./embeddings.js";
 
 const app = express();
 app.use(
   cors({
     origin: "*",
-  })
+  }),
 );
 app.use(bodyParser.raw({ inflate: true, type: "*/*" }));
 
@@ -22,7 +21,8 @@ let retriever = null;
 
 const port = 3003;
 
-const SYSTEM_PROMPT = "You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.";
+const SYSTEM_PROMPT =
+  "You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.";
 
 app.post("/v1/models/assistant/prompt", async (req, res) => {
   if (!retriever) {
@@ -47,13 +47,13 @@ app.post("/v1/models/assistant/prompt", async (req, res) => {
   });
 
   const sources = new Set(
-    relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url)
+    relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url),
   );
 
   if (sources.size > 0) {
     res.write("\n\nSources:\n");
     for (const sourceUrl of new Set(
-      relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url)
+      relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url),
     )) {
       res.write("- " + sourceUrl + "\n");
     }

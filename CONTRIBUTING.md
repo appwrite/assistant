@@ -43,6 +43,29 @@ We use a set of benchmark questions to test your changes:
 
 You can execute the [pnpm run test](./scripts/test-prompts.js) script to write snapshots of the answers to these questions to the tests folder.
 
+### 5. Running docker compose
+
+You can build the docker image and run it with docker compose:
+
+```bash
+docker compose build \
+  --build-arg _BUILD_WEBSITE_URL=https://appwrite.io \
+  --build-arg _BUILD_WEBSITE_VERSION=1.6.x \
+  --build-arg _BUILD_GIT_URL=https://github.com/appwrite/website.git \
+  --build-arg _BUILD_GIT_BRANCH=main
+
+docker compose up
+```
+
+### 6. Linting and Formatting
+
+We use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/) to lint and format our code.
+
+```bash
+pnpm format
+pnpm lint
+```
+
 ## Submit a Pull Request 🚀
 
 The branch naming convention is as follows
