@@ -1,12 +1,11 @@
 # Stage 1: Build
-FROM node:18-slim AS build
+FROM node:18-alpine AS build
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk update && apk add --no-cache \
     python3 \
-    python3-pip \
-    build-essential \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+    py3-pip \
+    build-base \
+    git
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -34,7 +33,7 @@ ENV _BUILD_WEBSITE_VERSION=${_BUILD_WEBSITE_VERSION}
 RUN pnpm run fetch-sources
 
 # Stage 2: Runtime
-FROM node:18-slim AS runtime
+FROM node:18-alpine AS runtime
 
 WORKDIR /usr/src/app
 

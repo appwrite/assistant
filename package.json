@@ -33,5 +33,6 @@
     "eslint": "^9.18.0",
     "globals": "^15.14.0",
     "prettier": "^3.4.2"
-  }
+  },
+  "packageManager": "pnpm@9.15.4"
 }
