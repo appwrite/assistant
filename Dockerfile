@@ -41,6 +41,7 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/node_modules /usr/src/app/node_modules
 COPY --from=builder /usr/src/app/sources /usr/src/app/sources
 COPY --from=builder /usr/src/app/package.json /usr/src/app/
+COPY --from=builder /usr/src/app/src /usr/src/app/src
 
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 
