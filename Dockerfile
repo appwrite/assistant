@@ -1,9 +1,9 @@
-# Stage 1: Build
-FROM node:18-alpine AS build
+FROM node:18-alpine AS base
 
-RUN apk update && apk add --no-cache \
+RUN apk add --no-cache \
     python3 \
-    py3-pip \
+    make \
+    g++ \
     build-base \
     git
 
@@ -11,14 +11,16 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
+FROM base AS builder
+
+COPY package.json pnpm-lock.yaml /usr/src/app/
 WORKDIR /usr/src/app
 
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+RUN pnpm fetch --prod
 
-RUN pnpm --prod install
+COPY . /usr/src/app
 
-COPY . .
+RUN pnpm install
 
 ARG _BUILD_GIT_URL
 ARG _BUILD_GIT_BRANCH
@@ -32,14 +34,14 @@ ENV _BUILD_WEBSITE_VERSION=${_BUILD_WEBSITE_VERSION}
 
 RUN pnpm run fetch-sources
 
-# Stage 2: Runtime
-FROM node:18-alpine AS runtime
+FROM base
 
 WORKDIR /usr/src/app
 
-COPY --from=build /usr/src/app .
-
-RUN rm -rf /usr/src/app/node_modules/.cache
+COPY --from=builder /usr/src/app/node_modules /usr/src/app/node_modules
+COPY --from=builder /usr/src/app/sources /usr/src/app/sources
+COPY --from=builder /usr/src/app/package.json /usr/src/app/
+COPY --from=builder /usr/src/app/src /usr/src/app/src
 
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 

@@ -4,6 +4,6 @@ services:
     ports:
       - 3003:3003
     volumes:
-      - ./docs:/app/docs
+      - ./sources:/usr/src/app/sources
     environment:
       - _APP_ASSISTANT_OPENAI_API_KEY

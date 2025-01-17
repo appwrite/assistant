@@ -30,7 +30,7 @@ If you want to pull from a different branch or repository, you can set the `_BUI
 
 First, retrieve an API key from OpenAI. You can sign up for an API key at [OpenAI](https://beta.openai.com/signup/). Once you have an API key, set it as the `_APP_ASSISTANT_OPENAI_API_KEY` environment variable.
 
-To run the server, execute the `dev` command. By default, the server will be available at `http://localhost:3000` 
+To run the server, execute the `dev` command. By default, the server will be available at `http://localhost:3003` 
 
 ```bash
 pnpm run dev
@@ -41,7 +41,7 @@ The server exposes a POST endpoint at `/`. The endpoint expects a raw text body 
 Use cURL to test the server, for example:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d "{\"prompt\": \"How do I create a new user?\"}" http://localhost:3000/v1/models/assistant/prompt
+curl -X POST -H "Content-Type: application/json" -d "{\"prompt\": \"How do I create a new user?\"}" http://localhost:3003/v1/models/assistant/prompt
 ```
 
 ## Contributing
