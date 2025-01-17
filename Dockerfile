@@ -4,7 +4,8 @@ RUN apk add --no-cache \
     python3 \
     make \
     g++ \
-    build-base
+    build-base \
+    git
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
