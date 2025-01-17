@@ -34,7 +34,9 @@ app.post("/v1/models/assistant/prompt", async (req, res) => {
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
 
-  let { prompt } = JSON.parse(text);
+  let { prompt, systemPrompt } = JSON.parse(text);
+  systemPrompt ??= SYSTEM_PROMPT;
+
   const relevantDocuments = await retriever.getRelevantDocuments(prompt);
 
   const chain = await getRagChain((token) => {
@@ -66,7 +68,8 @@ app.post("/v1/models/generic/prompt", async (req, res) => {
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
 
-  let { prompt } = JSON.parse(text);
+  let { prompt, systemPrompt } = JSON.parse(text);
+  systemPrompt ??= SYSTEM_PROMPT;
 
   const chain = await getOpenAIChat((token) => {
     res.write(token);
