@@ -1,0 +1,43 @@
+name: "Build"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: appwrite/assistant
+        tags: type=sha,prefix=pr-
+
+    - name: Build image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: false # Don't push, just build to verify
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          _BUILD_WEBSITE_URL=https://appwrite.io
+          _BUILD_WEBSITE_VERSION=1.6.x
+          _BUILD_GIT_URL=https://github.com/appwrite/website.git
+          _BUILD_GIT_BRANCH=main
