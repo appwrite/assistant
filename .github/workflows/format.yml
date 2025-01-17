@@ -1,4 +1,4 @@
-name: "Linter"
+name: "Format"
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
     branches: [main]
 
 jobs:
-  eslint:
-    name: "Eslint Check"
+  format:
+    name: "Run ESLint"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,5 +21,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run ESLint
-        run: npm run lint
+      - name: Run Prettier
+        run: npm run format
