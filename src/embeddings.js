@@ -19,7 +19,7 @@ export const getOpenAIChat = async (onToken) =>
   new OpenAIChat({
     modelName: "gpt-4o",
     openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-    temperature: 0.3,
+    temperature: 0,
     maxTokens: 1000,
     streaming: true,
     callbacks: [
