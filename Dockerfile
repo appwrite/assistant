@@ -13,12 +13,12 @@ RUN corepack enable
 
 FROM base AS builder
 
-COPY package.json pnpm-lock.yaml /app/
-WORKDIR /app
+COPY package.json pnpm-lock.yaml /usr/src/app/
+WORKDIR /usr/src/app
 
 RUN pnpm fetch --prod
 
-COPY . /app
+COPY . /usr/src/app
 
 RUN pnpm install
 

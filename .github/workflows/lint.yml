@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    name: "Run ESLint"
+    name: "Lint"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,5 +21,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run ESLint
+      - name: Lint
         run: npm run lint
