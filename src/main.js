@@ -45,7 +45,7 @@ app.post("/v1/models/assistant/prompt", async (req, res) => {
 
   await chain.call({
     input_documents: relevantDocuments,
-    question: `${SYSTEM_PROMPT}\n\n${prompt}`,
+    question: `${systemPrompt}\n\n${prompt}`,
   });
 
   const sources = new Set(
@@ -75,7 +75,10 @@ app.post("/v1/models/generic/prompt", async (req, res) => {
     res.write(token);
   });
 
-  await chain.call(`${SYSTEM_PROMPT}\n\n${prompt}`);
+  await chain.invoke([
+    ["system", systemPrompt],
+    ["human", prompt],
+  ])
 
   res.end();
 });
