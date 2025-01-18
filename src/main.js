@@ -70,11 +70,11 @@ app.post("/v1/models/generic/prompt", async (req, res) => {
   let { prompt, systemPrompt } = JSON.parse(text);
   systemPrompt ??= SYSTEM_PROMPT;
 
-  const chain = await getOpenAIChat((token) => {
+  const chat = await getOpenAIChat((token) => {
     res.write(token);
   }, systemPrompt);
 
-  await chain.call(prompt);
+  await chat.call(prompt);
 
   res.end();
 });
