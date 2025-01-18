@@ -3,6 +3,9 @@ import { readFile } from "fs/promises";
 import { Document } from "langchain/document";
 import { MarkdownTextSplitter } from "langchain/text_splitter";
 
+/**
+ * @returns {Promise<Document[]>}
+ */
 const getDocumentation = async () => {
   const filenames = await glob([
     "./sources/website/src/routes/docs/**/*.markdoc",
@@ -36,6 +39,9 @@ const getDocumentation = async () => {
   );
 };
 
+/**
+ * @returns {Promise<Document[]>} Array of Document objects containing processed references
+ */
 const getReferences = async () => {
   const filenames = await glob(["./sources/references/**/*.md"]);
 
@@ -64,7 +70,7 @@ export const getDocuments = async () => {
   return await splitDocuments([...documentation, ...references]);
 };
 
-/**x
+/**
  * @param {Document[]} documents
  * @returns {Promise<Document<Record<string, any>>[]>}
  */
@@ -80,6 +86,10 @@ async function splitDocuments(documents) {
   return await splitter.createDocuments(texts, metadatas);
 }
 
+/**
+ * @param {string} contents
+ * @returns {Object.<string, string>}
+ */
 function parseMarkdownFrontmatter(contents) {
   const raw = contents.match(/^---\n([\s\S]*?)\n---/);
   if (!raw) {
@@ -94,6 +104,10 @@ function parseMarkdownFrontmatter(contents) {
   return frontmatter;
 }
 
+/**
+ * @param {string} filename
+ * @returns {{sdk: string, service: string}}
+ */
 function parseReferenceData(filename) {
   const [sdk, service] = filename
     .replace("sources/references/", "")

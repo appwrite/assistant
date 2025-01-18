@@ -4,6 +4,9 @@ import { OpenAIChat } from "langchain/llms/openai";
 import { loadQAStuffChain } from "langchain/chains";
 import { getDocuments } from "./documents.js";
 
+/**
+ * @returns {Promise<VectorStoreRetriever<HNSWLib>>}
+ */
 export const intializeDocumentRetriever = async () => {
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
@@ -15,7 +18,11 @@ export const intializeDocumentRetriever = async () => {
   return vectorStore.asRetriever(5);
 };
 
-export const getOpenAIChat = async (onToken) =>
+/**
+ * @param {function} onToken
+ * @param {string} systemPrompt
+ */
+export const getOpenAIChat = async (onToken, systemPrompt) =>
   new OpenAIChat({
     modelName: "gpt-4o",
     openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
@@ -27,8 +34,18 @@ export const getOpenAIChat = async (onToken) =>
         handleLLMNewToken: onToken,
       },
     ],
+    prefixMessages: [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+    ],
   });
 
-export const getRagChain = async (onToken) => {
-  return loadQAStuffChain(await getOpenAIChat(onToken));
+/**
+ * @param {function} onToken
+ * @param {string} systemPrompt
+ */
+export const getRagChain = async (onToken, systemPrompt) => {
+  return loadQAStuffChain(await getOpenAIChat(onToken, systemPrompt));
 };
