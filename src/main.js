@@ -44,7 +44,7 @@ app.post("/v1/models/assistant/prompt", async (req, res) => {
 
   await chain.call({
     input_documents: relevantDocuments,
-    question: `${SYSTEM_PROMPT}\n\n${prompt}`,
+    question: `${systemPrompt}\n\n${prompt}`,
   });
 
   const sources = new Set(
