@@ -30,7 +30,6 @@ app.post("/v1/models/assistant/prompt", async (req, res) => {
     return;
   }
 
-  // raw to text
   const decoder = new TextDecoder();
   const text = decoder.decode(req.body);
 
@@ -41,11 +40,11 @@ app.post("/v1/models/assistant/prompt", async (req, res) => {
 
   const chain = await getRagChain((token) => {
     res.write(token);
-  });
+  }, systemPrompt);
 
   await chain.call({
     input_documents: relevantDocuments,
-    question: `${systemPrompt}\n\n${prompt}`,
+    question: prompt,
   });
 
   const sources = new Set(
@@ -71,14 +70,11 @@ app.post("/v1/models/generic/prompt", async (req, res) => {
   let { prompt, systemPrompt } = JSON.parse(text);
   systemPrompt ??= SYSTEM_PROMPT;
 
-  const chain = await getOpenAIChat((token) => {
+  const chat = await getOpenAIChat((token) => {
     res.write(token);
-  });
+  }, systemPrompt);
 
-  await chain.invoke([
-    ["system", systemPrompt],
-    ["human", prompt],
-  ])
+  await chat.call(prompt);
 
   res.end();
 });
