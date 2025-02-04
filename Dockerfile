@@ -10,6 +10,7 @@ RUN apk add --no-cache \
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+RUN corepack prepare pnpm@10.0.0 --activate
 
 FROM base AS builder
 
@@ -46,4 +47,4 @@ COPY --from=builder /usr/src/app/src /usr/src/app/src
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 
 EXPOSE 3003
-CMD [ "pnpm", "start" ]
+CMD [ "node", "src/main.js" ]
