@@ -40,3 +40,4 @@ await execa("git", ["config", "core.sparseCheckout", "true"], {
 });
 
 await execa("git", ["checkout", GIT_BRANCH], { cwd: LOCAL_PATH });
+await execa("rm", ["-rf", `${LOCAL_PATH}/.git`]);

@@ -39,10 +39,10 @@ RUN corepack prepare pnpm@10.0.0 --activate
 
 WORKDIR /usr/src/app
 
-COPY --from=builder /usr/src/app/node_modules /usr/src/app/node_modules
-COPY --from=builder /usr/src/app/sources /usr/src/app/sources
-COPY --from=builder /usr/src/app/package.json /usr/src/app/
-COPY --from=builder /usr/src/app/src /usr/src/app/src
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/sources ./sources
+COPY --from=builder /usr/src/app/package.json ./
+COPY --from=builder /usr/src/app/src ./src
 
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 
