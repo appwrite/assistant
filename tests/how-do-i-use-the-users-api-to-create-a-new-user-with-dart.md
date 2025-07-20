@@ -1,109 +1,34 @@
-To create a new user with Dart using the Appwrite Users API, you can use one of the provided methods depending on the hashing algorithm you want to use for the password. Below are examples for creating a user with different hashing algorithms:
+To create a new user using the Appwrite Users API with Dart, you can use the `create` method from the `Users` class. Below is an example of how to do this:
 
-### Using PHPass
 ```dart
 import 'package:dart_appwrite/dart_appwrite.dart';
 
 Client client = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+    .setEndpoint('https://<REGION>.cloud.appwrite.io/v1') // Your API Endpoint
     .setProject('<YOUR_PROJECT_ID>') // Your project ID
     .setKey('<YOUR_API_KEY>'); // Your secret API key
 
 Users users = Users(client);
 
-User result = await users.createPHPassUser(
-    userId: '<USER_ID>',
-    email: 'email@example.com',
-    password: 'password',
-    name: '<NAME>', // (optional)
-);
+Future<void> createUser() async {
+    try {
+        User result = await users.create(
+            userId: '<USER_ID>',
+            email: 'email@example.com', // (optional)
+            phone: '+12065550100', // (optional)
+            password: '', // (optional)
+            name: '<NAME>', // (optional)
+        );
+        print('User created: ${result.$id}');
+    } catch (e) {
+        print('Error creating user: $e');
+    }
+}
+
+createUser();
 ```
 
-### Using Scrypt
-```dart
-import 'package:dart_appwrite/dart_appwrite.dart';
-
-Client client = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-    .setProject('<YOUR_PROJECT_ID>') // Your project ID
-    .setKey('<YOUR_API_KEY>'); // Your secret API key
-
-Users users = Users(client);
-
-User result = await users.createScryptUser(
-    userId: '<USER_ID>',
-    email: 'email@example.com',
-    password: 'password',
-    passwordSalt: '<PASSWORD_SALT>',
-    passwordCpu: 0,
-    passwordMemory: 0,
-    passwordParallel: 0,
-    passwordLength: 0,
-    name: '<NAME>', // (optional)
-);
-```
-
-### Using Bcrypt
-```dart
-import 'package:dart_appwrite/dart_appwrite.dart';
-
-Client client = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-    .setProject('<YOUR_PROJECT_ID>') // Your project ID
-    .setKey('<YOUR_API_KEY>'); // Your secret API key
-
-Users users = Users(client);
-
-User result = await users.createBcryptUser(
-    userId: '<USER_ID>',
-    email: 'email@example.com',
-    password: 'password',
-    name: '<NAME>', // (optional)
-);
-```
-
-### Using Scrypt Modified
-```dart
-import 'package:dart_appwrite/dart_appwrite.dart';
-
-Client client = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-    .setProject('<YOUR_PROJECT_ID>') // Your project ID
-    .setKey('<YOUR_API_KEY>'); // Your secret API key
-
-Users users = Users(client);
-
-User result = await users.createScryptModifiedUser(
-    userId: '<USER_ID>',
-    email: 'email@example.com',
-    password: 'password',
-    passwordSalt: '<PASSWORD_SALT>',
-    passwordSaltSeparator: '<PASSWORD_SALT_SEPARATOR>',
-    passwordSignerKey: '<PASSWORD_SIGNER_KEY>',
-    name: '<NAME>', // (optional)
-);
-```
-
-### Using Argon2
-```dart
-import 'package:dart_appwrite/dart_appwrite.dart';
-
-Client client = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-    .setProject('<YOUR_PROJECT_ID>') // Your project ID
-    .setKey('<YOUR_API_KEY>'); // Your secret API key
-
-Users users = Users(client);
-
-User result = await users.createArgon2User(
-    userId: '<USER_ID>',
-    email: 'email@example.com',
-    password: 'password',
-    name: '<NAME>', // (optional)
-);
-```
-
-Replace `<YOUR_PROJECT_ID>`, `<YOUR_API_KEY>`, `<USER_ID>`, `<PASSWORD_SALT>`, `<PASSWORD_SALT_SEPARATOR>`, and `<PASSWORD_SIGNER_KEY>` with your actual Appwrite project details and user-specific information.
+In this example, replace `<REGION>`, `<YOUR_PROJECT_ID>`, `<YOUR_API_KEY>`, `<USER_ID>`, and other placeholders with your actual Appwrite project details and user information. The `create` method allows you to specify optional parameters such as `email`, `phone`, `password`, and `name`.
 
 Sources:
 - https://appwrite.io/docs/references/cloud/server-dart/users

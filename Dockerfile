@@ -1,11 +1,6 @@
-FROM node:18-alpine AS base
+FROM node:18-slim AS base
 
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    build-base \
-    git
+RUN apt-get update && apt-get install -y python3 make g++ git
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -14,14 +9,12 @@ RUN corepack prepare pnpm@10.0.0 --activate
 
 FROM base AS builder
 
-COPY package.json pnpm-lock.yaml /usr/src/app/
 WORKDIR /usr/src/app
 
-RUN pnpm fetch --prod
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
-COPY . /usr/src/app
-
-RUN pnpm install
+COPY . .
 
 ARG _BUILD_GIT_URL
 ARG _BUILD_GIT_BRANCH
@@ -35,7 +28,14 @@ ENV _BUILD_WEBSITE_VERSION=${_BUILD_WEBSITE_VERSION}
 
 RUN pnpm run fetch-sources
 
-FROM base
+FROM node:18-slim AS prod
+
+ENV NODE_ENV=production
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+RUN corepack prepare pnpm@10.0.0 --activate
 
 WORKDIR /usr/src/app
 
