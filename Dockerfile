@@ -1,11 +1,16 @@
-FROM node:18-slim AS base
+FROM node:18-alpine AS base
 
-RUN apt-get update && apt-get install -y python3 make g++ git
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    build-base \
+    git
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN corepack prepare pnpm@10.0.0 --activate
+RUN corepack prepare pnpm@10.13.1 --activate
 
 FROM base AS builder
 
@@ -28,14 +33,14 @@ ENV _BUILD_WEBSITE_VERSION=${_BUILD_WEBSITE_VERSION}
 
 RUN pnpm run fetch-sources
 
-FROM node:18-slim AS prod
+FROM node:18-alpine AS prod
 
 ENV NODE_ENV=production
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
-RUN corepack prepare pnpm@10.0.0 --activate
+RUN corepack prepare pnpm@10.13.1 --activate
 
 WORKDIR /usr/src/app
 
