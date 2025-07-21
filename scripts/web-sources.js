@@ -40,6 +40,7 @@ const SDKS = [
   "server-graphql",
   "server-rest",
 ];
+
 const SERVICES = [
   "account",
   "avatars",
@@ -47,6 +48,7 @@ const SERVICES = [
   "functions",
   "locale",
   "messaging",
+  "sites",
   "storage",
   "teams",
   "users",
@@ -55,37 +57,48 @@ const SERVICES = [
 await execa("rm", ["-rf", LOCAL_PATH]);
 await mkdir(LOCAL_PATH, { recursive: true });
 
+await Promise.all(
+  SDKS.map((sdk) => {
+    return mkdir(`${LOCAL_PATH}/${sdk}/`, { recursive: true });
+  }),
+);
+
 console.log("Downloading reference pages...");
 
-for (const sdk of SDKS) {
-  await mkdir(`./sources/references/${sdk}/`, { recursive: true });
+const start = Date.now();
 
-  for (const service of SERVICES) {
-    const url = new URL(
-      `/docs/references/${WEBSITE_VERSION}/${sdk}/${service}`,
-      WEBSITE_URL,
-    );
+await Promise.all(
+  SDKS.flatMap((sdk) =>
+    SERVICES.map(async (service) => {
+      const url = new URL(
+        `/docs/references/${WEBSITE_VERSION}/${sdk}/${service}`,
+        WEBSITE_URL,
+      );
 
-    const response = await fetch(url.toString());
+      try {
+        const response = await fetch(url.toString());
+        const html = await response.text();
+        if (!html) {
+          console.warn(`Skipping page ${url} - no content found`);
+          return;
+        }
 
-    const html = await response.text();
-    if (!html) {
-      console.warn(`Skipping page ${url} - no content found`);
-      continue;
-    }
+        const matches = html.match(
+          /<main class="contents" id="main">(.*?)<\/main>/s,
+        );
+        if (!matches || !matches[0]) {
+          console.warn(`Skipping page ${url} - no <main> tag found`);
+          return;
+        }
 
-    // Ignore the header and footer
-    const matches = html.match(
-      /<main class="contents" id="main">(.*?)<\/main>/s,
-    );
-    if (!matches || !matches[0]) {
-      console.warn(`Skipping page ${url} - no <main> tag found`);
-      continue;
-    }
+        const markdown = NodeHtmlMarkdown.translate(matches[0]);
+        await writeFile(`${LOCAL_PATH}/${sdk}/${service}.md`, markdown);
+        console.log(`Created ./sources/references/${sdk}/${service}.md`);
+      } catch (e) {
+        console.warn(`Failed to download ${url}:`, e);
+      }
+    }),
+  ),
+);
 
-    const markdown = NodeHtmlMarkdown.translate(matches[0]);
-
-    await writeFile(`./sources/references/${sdk}/${service}.md`, markdown);
-    console.log(`Created ./sources/references/${sdk}/${service}.md`);
-  }
-}
+console.log("References created in", (Date.now() - start) / 1000, "seconds");

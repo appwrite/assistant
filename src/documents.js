@@ -44,6 +44,7 @@ const getDocumentation = async () => {
  */
 const getReferences = async () => {
   const filenames = await glob(["./sources/references/**/*.md"]);
+  const version = process.env._BUILD_WEBSITE_VERSION ?? "cloud";
 
   return Promise.all(
     filenames.map(async (filename) => {
@@ -52,7 +53,7 @@ const getReferences = async () => {
       const { sdk, service } = parseReferenceData(filename);
       const metadata = {
         filename,
-        url: `https://appwrite.io/docs/references/cloud/${sdk}/${service}`,
+        url: `https://appwrite.io/docs/references/${version}/${sdk}/${service}`,
       };
 
       return new Document({
@@ -64,8 +65,10 @@ const getReferences = async () => {
 };
 
 export const getDocuments = async () => {
-  const documentation = await getDocumentation();
-  const references = await getReferences();
+  const [documentation, references] = await Promise.all([
+    getDocumentation(),
+    getReferences(),
+  ]);
 
   return await splitDocuments([...documentation, ...references]);
 };

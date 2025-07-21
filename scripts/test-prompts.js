@@ -8,6 +8,7 @@ const PROMPTS = [
   "How do I use the users API to create a new user with Dart?",
   "What endpoints are available for the Avatars API? I'm using the PHP SDK",
   "How to use Appwrite with React?",
+  "How do I host a simple static website with Appwrite?",
 ];
 const TESTS_FOLDER = "./tests";
 

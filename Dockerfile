@@ -10,18 +10,16 @@ RUN apk add --no-cache \
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN corepack prepare pnpm@10.0.0 --activate
+RUN corepack prepare pnpm@10.13.1 --activate
 
 FROM base AS builder
 
-COPY package.json pnpm-lock.yaml /usr/src/app/
 WORKDIR /usr/src/app
 
-RUN pnpm fetch --prod
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
-COPY . /usr/src/app
-
-RUN pnpm install
+COPY . .
 
 ARG _BUILD_GIT_URL
 ARG _BUILD_GIT_BRANCH
@@ -35,14 +33,21 @@ ENV _BUILD_WEBSITE_VERSION=${_BUILD_WEBSITE_VERSION}
 
 RUN pnpm run fetch-sources
 
-FROM base
+FROM node:18-alpine AS prod
+
+ENV NODE_ENV=production
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+RUN corepack prepare pnpm@10.13.1 --activate
 
 WORKDIR /usr/src/app
 
-COPY --from=builder /usr/src/app/node_modules /usr/src/app/node_modules
-COPY --from=builder /usr/src/app/sources /usr/src/app/sources
-COPY --from=builder /usr/src/app/package.json /usr/src/app/
-COPY --from=builder /usr/src/app/src /usr/src/app/src
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/sources ./sources
+COPY --from=builder /usr/src/app/package.json ./
+COPY --from=builder /usr/src/app/src ./src
 
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
 

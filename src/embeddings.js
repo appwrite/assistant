@@ -7,7 +7,7 @@ import { getDocuments } from "./documents.js";
 /**
  * @returns {Promise<VectorStoreRetriever<HNSWLib>>}
  */
-export const intializeDocumentRetriever = async () => {
+export const initializeDocumentRetriever = async () => {
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
   });

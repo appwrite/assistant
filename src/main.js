@@ -5,7 +5,7 @@ import express from "express";
 import {
   getRagChain,
   getOpenAIChat,
-  intializeDocumentRetriever as initializeRetriever,
+  initializeDocumentRetriever as initializeRetriever,
 } from "./embeddings.js";
 
 const app = express();
