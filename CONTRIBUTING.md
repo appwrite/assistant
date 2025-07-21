@@ -11,7 +11,7 @@ If you are worried about or don’t know where to start, check out the next sect
 ### 1. Clone the repository with git
 
 ```bash
-git clone https://github.com/appwrite/console.git appwrite-assistant
+git clone https://github.com/appwrite/assistant.git appwrite-assistant
 ```
 
 ### 2. Install dependencies with pnpm
