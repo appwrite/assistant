@@ -20,9 +20,11 @@ To set up database collections and documents in Appwrite, you can follow these s
    - Enable **Document security** to allow setting permissions at the document level.
    - Click the **Update** button to save changes.
 
-### Step 3: Use Appwrite SDK to Interact with the Database
+### Step 3: Create Documents
 
-#### Using Node.js SDK
+You can create documents using the Appwrite SDKs. Below are examples using Node.js and Web SDKs.
+
+#### Node.js SDK Example
 
 ```javascript
 const sdk = require('node-appwrite');
@@ -34,24 +36,23 @@ client
     .setProject('YOUR_PROJECT_ID') // Your project ID
     .setKey('YOUR_API_KEY'); // Your secret API key
 
-// Initialize the database service
 const databases = new sdk.Databases(client);
 
 // Create a document
-const promise = databases.createDocument('YOUR_DATABASE_ID', 'YOUR_COLLECTION_ID', 'unique()', {
+databases.createDocument('YOUR_DATABASE_ID', 'YOUR_COLLECTION_ID', 'unique()', {
     userId: 'user123',
     title: 'My Idea',
     description: 'This is a description of my idea.'
-});
-
-promise.then(function (response) {
-    console.log(response); // Success
-}, function (error) {
-    console.log(error); // Failure
+})
+.then(response => {
+    console.log(response);
+})
+.catch(error => {
+    console.error(error);
 });
 ```
 
-#### Using Web SDK
+#### Web SDK Example
 
 ```javascript
 import { Client, Databases } from 'appwrite';
@@ -62,7 +63,6 @@ client
     .setEndpoint('https://[YOUR_APPWRITE_ENDPOINT]') // Your Appwrite Endpoint
     .setProject('YOUR_PROJECT_ID'); // Your project ID
 
-// Initialize the database service
 const databases = new Databases(client);
 
 // Create a document
@@ -70,14 +70,16 @@ databases.createDocument('YOUR_DATABASE_ID', 'YOUR_COLLECTION_ID', 'unique()', {
     userId: 'user123',
     title: 'My Idea',
     description: 'This is a description of my idea.'
-}).then(response => {
-    console.log(response); // Success
-}).catch(error => {
-    console.log(error); // Failure
+})
+.then(response => {
+    console.log(response);
+})
+.catch(error => {
+    console.error(error);
 });
 ```
 
-These steps and code examples will help you set up and interact with database collections and documents in Appwrite. Make sure to replace placeholders like `YOUR_APPWRITE_ENDPOINT`, `YOUR_PROJECT_ID`, `YOUR_DATABASE_ID`, and `YOUR_COLLECTION_ID` with your actual Appwrite project details.
+Replace `YOUR_APPWRITE_ENDPOINT`, `YOUR_PROJECT_ID`, `YOUR_API_KEY`, `YOUR_DATABASE_ID`, and `YOUR_COLLECTION_ID` with your actual Appwrite endpoint, project ID, API key, database ID, and collection ID respectively.
 
 Sources:
 - https://appwrite.io/docs/tutorials/react-native/step-6/
