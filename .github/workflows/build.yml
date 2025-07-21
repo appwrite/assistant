@@ -38,6 +38,6 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
           _BUILD_WEBSITE_URL=https://appwrite.io
-          _BUILD_WEBSITE_VERSION=1.6.x
+          _BUILD_WEBSITE_VERSION=cloud
           _BUILD_GIT_URL=https://github.com/appwrite/website.git
           _BUILD_GIT_BRANCH=main
