@@ -10,10 +10,22 @@ import { getDocuments } from "./documents.js";
 export const initializeDocumentRetriever = async () => {
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
+    configuration: {
+      baseURL: process.env._APP_ASSISTANT_BASE_URL || "https://api.openai.com/v1",
+    },
+    modelName: process.env._APP_ASSISTANT_EMBEDDING_MODEL || "text-embedding-ada-002",
+    batchSize: 10,
   });
 
   const documents = await getDocuments();
-  const vectorStore = await HNSWLib.fromDocuments(documents, embeddings);
+  
+  if (documents.length === 0) {
+    throw new Error("No documents found. Make sure to run 'pnpm run fetch-sources' first.");
+  }
+
+  const vectorStore = await HNSWLib.fromDocuments(documents, embeddings, {
+    space: "cosine",
+  });
 
   return vectorStore.asRetriever(5);
 };
@@ -24,8 +36,11 @@ export const initializeDocumentRetriever = async () => {
  */
 export const getOpenAIChat = async (onToken, systemPrompt) =>
   new OpenAIChat({
-    modelName: "gpt-4o",
+    modelName: process.env._APP_ASSISTANT_MODEL_NAME || "gpt-4o",
     openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
+    configuration: {
+      baseURL: process.env._APP_ASSISTANT_BASE_URL || "https://api.openai.com/v1",
+    },
     temperature: 0,
     maxTokens: 1000,
     streaming: true,

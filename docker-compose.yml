@@ -7,3 +7,6 @@ services:
       - ./sources:/usr/src/app/sources
     environment:
       - _APP_ASSISTANT_OPENAI_API_KEY
+      - _APP_ASSISTANT_BASE_URL
+      - _APP_ASSISTANT_MODEL_NAME
+      - _APP_ASSISTANT_EMBEDDING_MODEL
