@@ -50,6 +50,9 @@ COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/src ./src
 
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
+ENV _APP_ASSISTANT_BASE_URL='https://api.openai.com/v1'
+ENV _APP_ASSISTANT_MODEL_NAME='gpt-4o'
+ENV _APP_ASSISTANT_EMBEDDING_MODEL='text-embedding-ada-002'
 
 EXPOSE 3003
 CMD [ "node", "src/main.js" ]
