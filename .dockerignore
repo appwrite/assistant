@@ -1,2 +1,47 @@
 node_modules
 sources
+
+# Git
+.git
+.gitignore
+
+# Documentation (not needed in runtime)
+*.md
+README*
+CONTRIBUTING*
+LICENSE*
+
+# Build artifacts (built in Docker)
+dist
+
+# Lock files for other package managers
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Tests
+tests
+
+# IDE/Editor
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+*.log*
+
+.env
+.env.*
+
+.DS_Store
+Thumbs.db
+
+.github
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*.yml

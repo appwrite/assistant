@@ -1,15 +1,35 @@
-import { HNSWLib } from "langchain/vectorstores/hnswlib";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { OpenAIChat } from "langchain/llms/openai";
+import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
+import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 import { loadQAStuffChain } from "langchain/chains";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { VectorStoreRetriever } from "@langchain/core/vectorstores";
 import { getDocuments } from "./documents.js";
+
+/**
+ * @param {function} onToken
+ * @returns {ChatOpenAI}
+ */
+const createChatModel = (onToken) => {
+  return new ChatOpenAI({
+    model: process.env._APP_ASSISTANT_OPENAI_MODEL,
+    apiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
+    temperature: 0,
+    maxTokens: 1000,
+    streaming: true,
+    callbacks: [
+      {
+        handleLLMNewToken: onToken,
+      },
+    ],
+  });
+};
 
 /**
  * @returns {Promise<VectorStoreRetriever<HNSWLib>>}
  */
 export const initializeDocumentRetriever = async () => {
   const embeddings = new OpenAIEmbeddings({
-    openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
+    apiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
   });
 
   const documents = await getDocuments();
@@ -20,32 +40,22 @@ export const initializeDocumentRetriever = async () => {
 
 /**
  * @param {function} onToken
- * @param {string} systemPrompt
  */
-export const getOpenAIChat = async (onToken, systemPrompt) =>
-  new OpenAIChat({
-    modelName: "gpt-4o",
-    openAIApiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
-    temperature: 0,
-    maxTokens: 1000,
-    streaming: true,
-    callbacks: [
-      {
-        handleLLMNewToken: onToken,
-      },
-    ],
-    prefixMessages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-    ],
-  });
+export const getOpenAIChat = async (onToken) => {
+  return createChatModel(onToken);
+};
 
 /**
  * @param {function} onToken
  * @param {string} systemPrompt
  */
 export const getRagChain = async (onToken, systemPrompt) => {
-  return loadQAStuffChain(await getOpenAIChat(onToken, systemPrompt));
+  const llm = createChatModel(onToken);
+
+  const prompt = ChatPromptTemplate.fromMessages([
+    ["system", systemPrompt],
+    ["human", "{context}\n\n{question}"],
+  ]);
+
+  return loadQAStuffChain(llm, { prompt });
 };

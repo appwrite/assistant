@@ -7,3 +7,4 @@ services:
       - ./sources:/usr/src/app/sources
     environment:
       - _APP_ASSISTANT_OPENAI_API_KEY
+      - _APP_ASSISTANT_OPENAI_MODEL
