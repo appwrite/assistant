@@ -2,7 +2,6 @@ import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
 import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 import { loadQAStuffChain } from "langchain/chains";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { VectorStoreRetriever } from "@langchain/core/vectorstores";
 import { getDocuments } from "./documents.js";
 
 /**
@@ -24,9 +23,6 @@ const createChatModel = (onToken) => {
   });
 };
 
-/**
- * @returns {Promise<VectorStoreRetriever<HNSWLib>>}
- */
 export const initializeDocumentRetriever = async () => {
   const embeddings = new OpenAIEmbeddings({
     apiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
