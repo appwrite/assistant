@@ -6,9 +6,6 @@ import {
   initializeDocumentRetriever as initializeRetriever,
 } from "./embeddings.js";
 
-import { BaseRetriever } from "@langchain/core/retrievers";
-
-/** @type BaseRetriever } */
 let retriever = null;
 
 const port = 3003;
@@ -16,10 +13,19 @@ const port = 3003;
 const SYSTEM_PROMPT =
   "You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.";
 
-const streamResponse = async (callback) => {
-  let chunks = [];
-  await callback((token) => chunks.push(token));
-  return chunks.join("");
+const createStreamingResponse = (callback) => {
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        await callback((token) => {
+          controller.enqueue(new TextEncoder().encode(token));
+        });
+        controller.close();
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+  });
 };
 
 Bun.serve({
@@ -61,27 +67,26 @@ Bun.serve({
 
       const relevantDocuments = await retriever.invoke(prompt);
 
-      const response = await streamResponse(async (onToken) => {
+      const sources = new Set(
+        relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url),
+      );
+
+      const stream = createStreamingResponse(async (onToken) => {
         const chain = await getRagChain(onToken, SYSTEM_PROMPT);
         await chain.invoke({
           input_documents: relevantDocuments,
           question: prompt,
         });
+
+        if (sources.size > 0) {
+          onToken("\n\nSources:\n");
+          for (const sourceUrl of sources) {
+            onToken("- " + sourceUrl + "\n");
+          }
+        }
       });
 
-      const sources = new Set(
-        relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url),
-      );
-
-      let fullResponse = response;
-      if (sources.size > 0) {
-        fullResponse += "\n\nSources:\n";
-        for (const sourceUrl of sources) {
-          fullResponse += "- " + sourceUrl + "\n";
-        }
-      }
-
-      return new Response(fullResponse, {
+      return new Response(stream, {
         headers: { ...corsHeaders, "Content-Type": "text/plain" },
       });
     }
@@ -91,7 +96,7 @@ Bun.serve({
       const body = await req.json();
       const { prompt } = body;
 
-      const response = await streamResponse(async (onToken) => {
+      const stream = createStreamingResponse(async (onToken) => {
         const chat = await getOpenAIChat(onToken);
         await chat.invoke([
           new SystemMessage(SYSTEM_PROMPT),
@@ -99,7 +104,7 @@ Bun.serve({
         ]);
       });
 
-      return new Response(response, {
+      return new Response(stream, {
         headers: { ...corsHeaders, "Content-Type": "text/plain" },
       });
     }
