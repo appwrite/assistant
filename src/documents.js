@@ -1,7 +1,7 @@
 import { glob } from "glob";
 import { readFile } from "fs/promises";
-import { Document } from "langchain/document";
-import { MarkdownTextSplitter } from "langchain/text_splitter";
+import { Document } from "@langchain/core/documents";
+import { MarkdownTextSplitter } from "@langchain/textsplitters";
 
 /**
  * @returns {Promise<Document[]>}

@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM oven/bun:alpine AS base
 
 RUN apk add --no-cache \
     python3 \
@@ -7,49 +7,52 @@ RUN apk add --no-cache \
     build-base \
     git
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-RUN corepack prepare pnpm@10.13.1 --activate
-
 FROM base AS builder
 
 WORKDIR /usr/src/app
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
+COPY package.json bun.lock* ./
 
-COPY . .
+RUN bun install --frozen-lockfile --production
 
-ARG _BUILD_GIT_URL
-ARG _BUILD_GIT_BRANCH
-ARG _BUILD_WEBSITE_URL
-ARG _BUILD_WEBSITE_VERSION
+COPY src ./src
+COPY scripts ./scripts
+
+ARG _BUILD_GIT_BRANCH=main
+ARG _BUILD_WEBSITE_VERSION=cloud
+ARG _BUILD_WEBSITE_URL=https://appwrite.io
+ARG _BUILD_GIT_URL=https://github.com/appwrite/website.git
 
 ENV _BUILD_GIT_URL=${_BUILD_GIT_URL}
 ENV _BUILD_GIT_BRANCH=${_BUILD_GIT_BRANCH}
 ENV _BUILD_WEBSITE_URL=${_BUILD_WEBSITE_URL}
 ENV _BUILD_WEBSITE_VERSION=${_BUILD_WEBSITE_VERSION}
 
-RUN pnpm run fetch-sources
+RUN bun run fetch-sources
 
-FROM node:18-alpine AS prod
+ARG _APP_ASSISTANT_OPENAI_API_KEY
+ENV _APP_ASSISTANT_OPENAI_API_KEY=${_APP_ASSISTANT_OPENAI_API_KEY}
+
+RUN bun build src/main.js \
+    --outdir ./dist \
+    --target bun \
+    --minify \
+    --sourcemap=none \
+    --external hnswlib-node
+
+FROM oven/bun:alpine AS prod
 
 ENV NODE_ENV=production
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-RUN corepack enable
-RUN corepack prepare pnpm@10.13.1 --activate
 
 WORKDIR /usr/src/app
 
-COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/sources ./sources
-COPY --from=builder /usr/src/app/package.json ./
-COPY --from=builder /usr/src/app/src ./src
+COPY --from=builder /usr/src/app/package.json ./package.json
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 ENV _APP_ASSISTANT_OPENAI_API_KEY=''
+ENV _APP_ASSISTANT_OPENAI_MODEL='gpt-4o'
 
 EXPOSE 3003
-CMD [ "node", "src/main.js" ]
+CMD [ "bun", "dist/main.js" ]

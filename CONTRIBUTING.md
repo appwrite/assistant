@@ -14,12 +14,12 @@ If you are worried about or don’t know where to start, check out the next sect
 git clone https://github.com/appwrite/assistant.git appwrite-assistant
 ```
 
-### 2. Install dependencies with pnpm
+### 2. Install dependencies with bun
 
 Navigate to the Appwrite Assistant repository and install dependencies.
 
 ```bash
-cd appwrite-assistant && pnpm install
+cd appwrite-assistant && bun install
 ```
 
 ### 3. Setup environment variables
@@ -29,7 +29,7 @@ Add a `.env` file by copying the `.env.example` file as a template in the projec
 Finally, start a development server:
 
 ```bash
-pnpm run dev
+bun run dev
 ```
 
 ### 4. Testing the changes
@@ -41,7 +41,7 @@ We use a set of benchmark questions to test your changes:
 - What's the difference between Server and Client SDKs?
 - How do I use the users API to create a new user with Dart?
 
-You can execute the [pnpm run test](./scripts/test-prompts.js) script to write snapshots of the answers to these questions to the tests folder.
+You can execute the [bun run test](./scripts/test-prompts.js) script to write snapshots of the answers to these questions to the tests folder.
 
 ### 5. Running docker compose
 
@@ -62,8 +62,8 @@ docker compose up -d
 We use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/) to lint and format our code.
 
 ```bash
-pnpm format
-pnpm lint
+bun run format
+bun run lint
 ```
 
 ## Submit a Pull Request 🚀
