@@ -8,32 +8,32 @@ Appwrite Assistant is an AI-powered API that helps you with Appwrite-related tas
 
 ## Installation
 
-Make sure you have [pnpm](https://pnpm.io/) installed.
+Make sure you have [Bun](https://bun.sh) installed.
 
 To install, run the following command.
 
 ```bash
-pnpm i
+bun install
 ```
 
 Next, fetch the Appwrite-specific sources used by the assistant. This will download the sources from the Appwrite documentation and store them in the `./sources` directory.
 
 ```bash
-pnpm run fetch-sources
+bun run fetch-sources
 ```
 
-The scripts will pull the latest documentation from the `main` branch of the [website repository](https://github.com/appwrite/website), and the latest API reference from live [Appwrite documentation](https://appwrite.io/docs). 
+The scripts will pull the latest documentation from the `main` branch of the [website repository](https://github.com/appwrite/website), and the latest API reference from live [Appwrite documentation](https://appwrite.io/docs).
 
 If you want to pull from a different branch or repository, you can set the `_BUILD_GIT_URL` and `_BUILD_WEBSITE_URL` environment variables.
 
 ## Usage
 
-First, retrieve an API key from OpenAI. You can sign up for an API key at [OpenAI](https://beta.openai.com/signup/). Once you have an API key, set it as the `_APP_ASSISTANT_OPENAI_API_KEY` environment variable.
+First, retrieve an API key from OpenAI. You can sign up for an API key at [OpenAI](https://beta.openai.com/signup/). Once you have an API key, set it as the `_APP_ASSISTANT_OPENAI_API_KEY` environment variable. Optionally, you can set `_APP_ASSISTANT_OPENAI_MODEL` (defaults to `gpt-4o`).
 
-To run the server, execute the `dev` command. By default, the server will be available at `http://localhost:3003` 
+To run the server, execute the `dev` command. By default, the server will be available at `http://localhost:3003`
 
 ```bash
-pnpm run dev
+bun run dev
 ```
 
 The server exposes a POST endpoint at `/`. The endpoint expects a raw text body containing the query for the assistant. The answer to the query will be streamed back to the client as raw text.

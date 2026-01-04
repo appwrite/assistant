@@ -11,7 +11,7 @@ import { getDocuments } from "./documents.js";
  */
 const createChatModel = (onToken) => {
   return new ChatOpenAI({
-    model: process.env._APP_ASSISTANT_OPENAI_MODEL,
+    model: process.env._APP_ASSISTANT_OPENAI_MODEL || "gpt-4o",
     apiKey: process.env._APP_ASSISTANT_OPENAI_API_KEY,
     temperature: 0,
     maxTokens: 1000,
