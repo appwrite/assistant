@@ -25,13 +25,14 @@ ARG _BUILD_GIT_URL
 ARG _BUILD_GIT_BRANCH
 ARG _BUILD_WEBSITE_URL
 ARG _BUILD_WEBSITE_VERSION
+ARG SKIP_FETCH_SOURCES=false
 
 ENV _BUILD_GIT_URL=${_BUILD_GIT_URL}
 ENV _BUILD_GIT_BRANCH=${_BUILD_GIT_BRANCH}
 ENV _BUILD_WEBSITE_URL=${_BUILD_WEBSITE_URL}
 ENV _BUILD_WEBSITE_VERSION=${_BUILD_WEBSITE_VERSION}
 
-RUN pnpm run fetch-sources
+RUN if [ "$SKIP_FETCH_SOURCES" = "true" ]; then mkdir -p sources; else pnpm run fetch-sources; fi
 
 FROM node:18-alpine AS prod
 
@@ -43,6 +44,8 @@ RUN corepack enable
 RUN corepack prepare pnpm@10.13.1 --activate
 
 WORKDIR /usr/src/app
+
+ARG SKIP_FETCH_SOURCES=false
 
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/sources ./sources
