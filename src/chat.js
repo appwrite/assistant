@@ -277,7 +277,7 @@ export async function streamAssistantResponse({
             fullText += sourceText;
         }
 
-        writeEvent(res, { event: 'done' });
+        writeEvent(res, { event: 'done', traceId });
 
         // Finalise Langfuse spans
         generation.end({ output: toolCallEmitted ? '[tool_call]' : fullText });
