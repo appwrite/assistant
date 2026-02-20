@@ -1,95 +1,124 @@
-import "dotenv/config";
-import bodyParser from "body-parser";
-import cors from "cors";
-import express from "express";
-import {
-  getRagChain,
-  getOpenAIChat,
-  initializeDocumentRetriever as initializeRetriever,
-} from "./embeddings.js";
+import 'dotenv/config';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import { initializeDocumentRetriever } from './embeddings.js';
+import { streamAssistantResponse, submitFeedback } from './chat.js';
 
 const app = express();
-app.use(
-  cors({
-    origin: "*",
-  }),
-);
-app.use(bodyParser.raw({ inflate: true, type: "*/*" }));
-
-/** @type {import("langchain/schema/retriever").BaseRetriever?} */
-let retriever = null;
-
 const port = 3003;
 
-const SYSTEM_PROMPT =
-  "You are an AI chat bot with information about Appwrite documentation. You need to help developers answer Appwrite related questions only. You will be given an input and you need to respond with the appropriate answer, using information confirmed with Appwrite documentation and reference pages. If applicable, show code examples. Code examples should use the Node and Web Appwrite SDKs unless otherwise specified.";
+app.use(cors({ origin: '*' }));
+app.use(bodyParser.raw({ inflate: true, type: '*/*' }));
 
-app.post("/v1/models/assistant/prompt", async (req, res) => {
-  if (!retriever) {
-    res.status(500).send("Search index not initialized");
-    return;
-  }
+/** @type {import('langchain/schema/retriever').BaseRetriever | null} */
+let retriever = null;
 
-  const decoder = new TextDecoder();
-  const text = decoder.decode(req.body);
-
-  let { prompt, systemPrompt } = JSON.parse(text);
-  systemPrompt ??= SYSTEM_PROMPT;
-
-  const relevantDocuments = await retriever.getRelevantDocuments(prompt);
-
-  const chain = await getRagChain((token) => {
-    res.write(token);
-  }, systemPrompt);
-
-  await chain.call({
-    input_documents: relevantDocuments,
-    question: prompt,
-  });
-
-  const sources = new Set(
-    relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url),
-  );
-
-  if (sources.size > 0) {
-    res.write("\n\nSources:\n");
-    for (const sourceUrl of new Set(
-      relevantDocuments.map((d) => d.metadata.url).filter((url) => !!url),
-    )) {
-      res.write("- " + sourceUrl + "\n");
+// ---------------------------------------------------------------------------
+// POST /v1/models/assistant/prompt
+//
+// Request body (JSON):
+// {
+//   messages:  CoreMessage[]  Full conversation including the current user turn.
+//              At minimum: [{ role: 'user', content: '<prompt>' }]
+//   context:   object         Console page/project/org context (optional)
+//   model:     string         Anthropic model ID (set by PHP gateway, optional)
+//   toolTier:  string         'none' | 'read' | 'readwrite' (set by PHP gateway)
+//   traceId:   string         Langfuse trace ID (optional, auto-generated if absent)
+//   userId:    string         Appwrite user ID for tracing (optional)
+// }
+//
+// Response: text/event-stream
+// Events: { event:'text', text:'...' }
+//         { event:'tool_call', toolCallId:'...', name:'...', args:{} }
+//         { event:'done' }
+//         { event:'error', message:'...' }
+// ---------------------------------------------------------------------------
+app.post('/v1/models/assistant/prompt', async (req, res) => {
+    if (!retriever) {
+        res.status(503).json({ error: 'Search index not yet initialized. Try again shortly.' });
+        return;
     }
-  }
 
-  res.end();
+    let body;
+    try {
+        const decoder = new TextDecoder();
+        body = JSON.parse(decoder.decode(req.body));
+    } catch {
+        res.status(400).json({ error: 'Invalid JSON body' });
+        return;
+    }
+
+    const {
+        messages,
+        context = {},
+        model = 'claude-haiku-4-5-20251001',
+        toolTier = 'none',
+        traceId = crypto.randomUUID(),
+        userId = 'anonymous',
+    } = body;
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+        res.status(400).json({ error: '`messages` must be a non-empty array' });
+        return;
+    }
+
+    await streamAssistantResponse({
+        messages,
+        context,
+        model,
+        toolTier,
+        retriever,
+        traceId,
+        userId,
+        res,
+    });
 });
 
-app.post("/v1/models/generic/prompt", async (req, res) => {
-  const decoder = new TextDecoder();
-  const text = decoder.decode(req.body);
+// ---------------------------------------------------------------------------
+// POST /v1/feedback/score
+//
+// Request body (JSON):
+// { traceId: string, score: number }   score: 1 = positive, 0 = negative
+// ---------------------------------------------------------------------------
+app.post('/v1/feedback/score', async (req, res) => {
+    let body;
+    try {
+        const decoder = new TextDecoder();
+        body = JSON.parse(decoder.decode(req.body));
+    } catch {
+        res.status(400).json({ error: 'Invalid JSON body' });
+        return;
+    }
 
-  let { prompt, systemPrompt } = JSON.parse(text);
-  systemPrompt ??= SYSTEM_PROMPT;
+    const { traceId, score } = body;
 
-  const chat = await getOpenAIChat((token) => {
-    res.write(token);
-  }, systemPrompt);
+    if (!traceId || typeof score !== 'number') {
+        res.status(400).json({ error: '`traceId` and numeric `score` are required' });
+        return;
+    }
 
-  await chat.call(prompt);
-
-  res.end();
+    await submitFeedback({ traceId, score });
+    res.status(204).end();
 });
 
-app.get("/v1/health", (_, res) => {
-  res.send("OK");
+// ---------------------------------------------------------------------------
+// GET /v1/health
+// ---------------------------------------------------------------------------
+app.get('/v1/health', (_, res) => {
+    res.json({ status: 'ok', indexReady: retriever !== null });
 });
 
+// ---------------------------------------------------------------------------
+// Start
+// ---------------------------------------------------------------------------
 app.listen(port, async () => {
-  console.log(`Started server on port: ${port}`);
-  console.log("Initializing search index...");
-  try {
-    retriever = await initializeRetriever();
-    console.log("Search index initialized");
-  } catch (e) {
-    console.error(e);
-  }
+    console.log(`[assistant] Server listening on port ${port}`);
+    console.log('[assistant] Initializing RAG search index...');
+    try {
+        retriever = await initializeDocumentRetriever();
+        console.log('[assistant] Search index ready');
+    } catch (err) {
+        console.error('[assistant] Failed to initialize search index:', err);
+    }
 });

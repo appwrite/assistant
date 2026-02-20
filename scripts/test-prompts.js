@@ -19,14 +19,28 @@ for (const prompt of PROMPTS) {
 
   const response = await fetch(SERVER_URL, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      prompt,
+      messages: [{ role: "user", content: prompt }],
     }),
   });
 
   if (!response.ok) throw new Error(response.statusText);
 
-  const text = await response.text();
+  // Collect SSE events and extract text deltas
+  const raw = await response.text();
+  const text = raw
+    .split("\n")
+    .filter((line) => line.startsWith("data: "))
+    .map((line) => {
+      try {
+        const parsed = JSON.parse(line.slice(6));
+        return parsed.event === "text" ? parsed.text : "";
+      } catch {
+        return "";
+      }
+    })
+    .join("");
 
   await writeFile(`${TESTS_FOLDER}/${slugify(prompt)}.md`, text);
 }

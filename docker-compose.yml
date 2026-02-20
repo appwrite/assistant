@@ -6,4 +6,11 @@ services:
     volumes:
       - ./sources:/usr/src/app/sources
     environment:
+      # Legacy — used by LangChain embeddings (OpenAI text-embedding-ada-002)
       - _APP_ASSISTANT_OPENAI_API_KEY
+      # Anthropic — used by Vercel AI SDK for LLM generation
+      - _APP_ASSISTANT_ANTHROPIC_API_KEY
+      # Langfuse observability (optional — disabled when keys are absent)
+      - _APP_ASSISTANT_LANGFUSE_PUBLIC_KEY
+      - _APP_ASSISTANT_LANGFUSE_SECRET_KEY
+      - _APP_ASSISTANT_LANGFUSE_HOST
